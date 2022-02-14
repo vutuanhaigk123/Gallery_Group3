@@ -1,0 +1,10 @@
+<resources>
+    <string name="app_name">Gallery</string>
+    <string name="btnPhotos">Photos</string>
+    <string name="btnAlbums">Albums</string>
+    <string name="btnSearch">Search</string>
+
+    <string name="mnuShare">Share</string>
+    <string name="mnuSetImage">Set image as…</string>
+    <string name="mnuCopy">Copy to Clipboard</string>
+</resources>

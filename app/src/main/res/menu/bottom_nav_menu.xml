@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/btnAlbums"
+        android:icon="@drawable/ic_baseline_photo_album_24"
+        android:title="@string/btnAlbums" />
+    <item
+        android:id="@+id/btnPhotos"
+        android:icon="@drawable/ic_baseline_photo_library_24"
+        android:title="@string/btnPhotos" />
+    <item
+        android:id="@+id/btnSearch"
+        android:icon="@drawable/ic_baseline_search_24"
+        android:title="@string/btnSearch" />
+</menu>
