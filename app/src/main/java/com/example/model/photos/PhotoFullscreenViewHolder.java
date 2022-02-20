@@ -11,15 +11,18 @@ import com.example.view.databinding.LayoutFullscreenPhotoBinding;
 
 public class PhotoFullscreenViewHolder extends ViewHolder{
     LayoutFullscreenPhotoBinding fullscreenPhotoBinding;
+    PhotoList photoList;
 
     @Override
     public ViewDataBinding getBinding() {
         return fullscreenPhotoBinding;
     }
 
-    public PhotoFullscreenViewHolder(@NonNull LayoutFullscreenPhotoBinding fullscreenPhotoBinding) {
+    public PhotoFullscreenViewHolder(@NonNull LayoutFullscreenPhotoBinding fullscreenPhotoBinding,
+                                     PhotoList photoList) {
         super(fullscreenPhotoBinding.getRoot());
         this.fullscreenPhotoBinding = fullscreenPhotoBinding;
+        this.photoList = photoList;
         fullscreenPhotoBinding.imageView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

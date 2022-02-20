@@ -27,7 +27,7 @@ public class PhotosFragment extends Fragment {
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
     private FragmentPhotosBinding binding;
-    private ObservableArrayList<Photo> photoList;
+    private PhotoList photoList;
 
     // TODO: Rename and change types of parameters
     private String mParam1;
@@ -62,7 +62,7 @@ public class PhotosFragment extends Fragment {
             mParam1 = getArguments().getString(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
         }
-        photoList = PhotoList.readMediaStore(getContext());
+        photoList = new PhotoList(PhotoList.readMediaStore(getContext()));
     }
 
     @Override
@@ -72,7 +72,8 @@ public class PhotosFragment extends Fragment {
         this.binding = FragmentPhotosBinding.inflate(inflater, container, false);
         binding.recyclerView.setLayoutManager( new GridLayoutManager(container.getContext(), 3));
 
-        binding.recyclerView.setAdapter(new PhotoAdapter(photoList, PhotoAdapter.THUMBNAIL_MODE));
+        binding.recyclerView.setAdapter(new PhotoAdapter(photoList,
+                PhotoAdapter.THUMBNAIL_MODE));
 //        binding.recyclerView.addItemDecoration(
 //                new DividerItemDecoration(container.getContext(),
 //                        DividerItemDecoration.VERTICAL));

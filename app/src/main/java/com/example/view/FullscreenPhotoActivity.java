@@ -23,6 +23,7 @@ import com.example.view.databinding.ActivityFullscreenPhotoBinding;
 public class FullscreenPhotoActivity extends AppCompatActivity {
 
     private ActivityFullscreenPhotoBinding binding;
+    private PhotoAdapter photoAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -31,8 +32,10 @@ public class FullscreenPhotoActivity extends AppCompatActivity {
         setContentView(binding.getRoot());
         Intent intent = getIntent();
         int pos = intent.getIntExtra("pos", 0);
-        binding.viewPager.setAdapter(new PhotoAdapter(
-                PhotoList.getPhotoList(), PhotoAdapter.FULLSCREEN_MODE));
+        PhotoList photoList = (PhotoList) intent.getSerializableExtra("photoList");
+        photoAdapter = new PhotoAdapter( photoList,
+                PhotoAdapter.FULLSCREEN_MODE);
+        binding.viewPager.setAdapter(photoAdapter);
         binding.viewPager.post(new Runnable() {
             @Override
             public void run() {
@@ -70,18 +73,16 @@ public class FullscreenPhotoActivity extends AppCompatActivity {
         ClipboardManager clipboard = (ClipboardManager)
                 getSystemService(Context.CLIPBOARD_SERVICE);
         Photo currentPhoto = getCurrentPhoto();
-        ClipData clip = ClipData.newUri(
-                getContentResolver(),
+        ClipData clip = ClipData.newUri(getContentResolver(),
                 currentPhoto.getFilename(),
                 currentPhoto.getUri(FullscreenPhotoActivity.this));
         clipboard.setPrimaryClip(clip);
         Toast.makeText(FullscreenPhotoActivity.this,
-                "Copy to clipboard successfully",
-                Toast.LENGTH_SHORT).show();
+                "Copy to clipboard successfully", Toast.LENGTH_SHORT).show();
     }
 
     private Photo getCurrentPhoto(){
-        return PhotoList.get(binding.viewPager.getCurrentItem());
+        return photoAdapter.getPhotoList().get(binding.viewPager.getCurrentItem());
     }
 
     private void shareImage(){
@@ -95,12 +96,12 @@ public class FullscreenPhotoActivity extends AppCompatActivity {
 
     private void setImageAs(){
         Intent intent = new Intent(Intent.ACTION_ATTACH_DATA);
-        intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-        intent.setDataAndType(
-                getCurrentPhoto().getUri(FullscreenPhotoActivity.this),
-                "image/*");
+        Photo currentPhoto = getCurrentPhoto();
+        intent.setDataAndType( currentPhoto.getUri(FullscreenPhotoActivity.this), "image/*");
         intent.putExtra("mimeType", "image/*");
-        startActivity(Intent.createChooser(intent, "Set image as:"));
+        intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+        startActivity(Intent.createChooser(
+                intent, "Set image as:"));
     }
 
 }

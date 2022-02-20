@@ -7,11 +7,17 @@ import android.provider.MediaStore;
 import androidx.databinding.ObservableArrayList;
 import androidx.loader.content.CursorLoader;
 
-public class PhotoList {
-    private static ObservableArrayList<Photo> photoList;
+import java.io.Serializable;
 
-    public static ObservableArrayList<Photo> getPhotoList() {
+public class PhotoList implements Serializable {
+    private ObservableArrayList<Photo> photoList;
+
+    public ObservableArrayList<Photo> getPhotoList() {
         return photoList;
+    }
+
+    public PhotoList(ObservableArrayList<Photo> photoList) {
+        this.photoList = photoList;
     }
 
     public static ObservableArrayList<Photo> readMediaStore(Context context){
@@ -39,11 +45,14 @@ public class PhotoList {
             }
             cursor.close();
         }
-        PhotoList.photoList = photoList;
         return photoList;
     }
 
-    public static Photo get(int index){
+    public int size(){
+        return photoList.size();
+    }
+
+    public Photo get(int index){
         return photoList.get(index);
     }
 }

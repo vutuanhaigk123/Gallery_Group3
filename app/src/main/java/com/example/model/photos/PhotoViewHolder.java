@@ -12,9 +12,11 @@ import com.example.view.databinding.LayoutPhotoThumbnailBinding;
 
 public class PhotoViewHolder extends ViewHolder {
     LayoutPhotoThumbnailBinding photoRowBinding;
-    public PhotoViewHolder(@NonNull LayoutPhotoThumbnailBinding photoRowBinding) {
+    PhotoList photoList;
+    public PhotoViewHolder(@NonNull LayoutPhotoThumbnailBinding photoRowBinding, PhotoList photoList) {
         super(photoRowBinding.getRoot());
         this.photoRowBinding = photoRowBinding;
+        this.photoList = photoList;
         photoRowBinding.imageView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -31,6 +33,7 @@ public class PhotoViewHolder extends ViewHolder {
     private void switchToFullscreenPhoto(){
         Intent intent = new Intent(photoRowBinding.getRoot().getContext(), FullscreenPhotoActivity.class);
         intent.putExtra("pos", photoRowBinding.getPhoto().getIndex());
+        intent.putExtra("photoList", photoList);
         photoRowBinding.getRoot().getContext().startActivity(intent);
 
     }
