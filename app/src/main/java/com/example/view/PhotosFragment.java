@@ -5,6 +5,8 @@ import android.os.Bundle;
 import androidx.databinding.ObservableArrayList;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import android.view.LayoutInflater;
 import android.view.View;
@@ -13,6 +15,7 @@ import android.view.ViewGroup;
 import com.example.model.photos.Photo;
 import com.example.model.photos.PhotoAdapter;
 import com.example.model.photos.PhotoList;
+import com.example.model.photos.PhotoSortByDateAdapter;
 import com.example.view.databinding.FragmentPhotosBinding;
 
 /**
@@ -70,10 +73,9 @@ public class PhotosFragment extends Fragment {
                              Bundle savedInstanceState) {
 
         this.binding = FragmentPhotosBinding.inflate(inflater, container, false);
-        binding.recyclerView.setLayoutManager( new GridLayoutManager(container.getContext(), 3));
-
-        binding.recyclerView.setAdapter(new PhotoAdapter(photoList,
-                PhotoAdapter.THUMBNAIL_MODE));
+        binding.recyclerView.setLayoutManager( new LinearLayoutManager(container.getContext(), RecyclerView.VERTICAL,false));
+        PhotoSortByDateAdapter photoSortByDateAdapter = new PhotoSortByDateAdapter(container.getContext(),photoList.getPhotoList(), PhotoAdapter.THUMBNAIL_MODE);
+        binding.recyclerView.setAdapter(photoSortByDateAdapter);
 //        binding.recyclerView.addItemDecoration(
 //                new DividerItemDecoration(container.getContext(),
 //                        DividerItemDecoration.VERTICAL));
