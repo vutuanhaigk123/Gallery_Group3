@@ -73,8 +73,13 @@ public class PhotosFragment extends Fragment {
                              Bundle savedInstanceState) {
 
         this.binding = FragmentPhotosBinding.inflate(inflater, container, false);
-        binding.recyclerView.setLayoutManager( new LinearLayoutManager(container.getContext(), RecyclerView.VERTICAL,false));
-        PhotoSortByDateAdapter photoSortByDateAdapter = new PhotoSortByDateAdapter(container.getContext(),photoList.getPhotoList(), PhotoAdapter.THUMBNAIL_MODE);
+        binding.recyclerView.setLayoutManager( new LinearLayoutManager(
+                container.getContext(),
+                RecyclerView.VERTICAL,false));
+        PhotoSortByDateAdapter photoSortByDateAdapter = new PhotoSortByDateAdapter(
+                container.getContext(),
+                photoList.getPhotoList(),
+                PhotoAdapter.THUMBNAIL_MODE);
         binding.recyclerView.setAdapter(photoSortByDateAdapter);
 //        binding.recyclerView.addItemDecoration(
 //                new DividerItemDecoration(container.getContext(),

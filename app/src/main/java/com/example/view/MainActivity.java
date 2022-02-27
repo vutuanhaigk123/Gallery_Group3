@@ -53,7 +53,6 @@ public class MainActivity extends AppCompatActivity {
                                     break;
                                 case R.id.btnPhotos:
                                     replaceFragment(photosFragment, R.id.btnPhotos);
-                                    System.out.println("After replace fragment when btnPhoto was clicked");
                                     break;
                                 case R.id.btnSearch:
                                     replaceFragment(searchFragment, R.id.btnSearch);
