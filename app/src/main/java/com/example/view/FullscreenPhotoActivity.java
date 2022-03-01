@@ -1,6 +1,7 @@
 package com.example.view;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.annotation.SuppressLint;
@@ -24,6 +25,7 @@ public class FullscreenPhotoActivity extends AppCompatActivity {
 
     private ActivityFullscreenPhotoBinding binding;
     private PhotoAdapter photoAdapter;
+    public static ActionBar actionBar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,6 +44,8 @@ public class FullscreenPhotoActivity extends AppCompatActivity {
                 binding.viewPager.setCurrentItem(pos);
             }
         });
+        actionBar = getSupportActionBar();
+        actionBar.setDisplayHomeAsUpEnabled(true);
     }
 
     // Option Menu
@@ -56,6 +60,9 @@ public class FullscreenPhotoActivity extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         switch (item.getItemId()){
+            case android.R.id.home:
+                finish();
+                return true;
             case R.id.mnuShare:
                 shareImage();
                 break;

@@ -38,6 +38,7 @@ public class MainActivity extends AppCompatActivity {
         addControls();
         addEvents();
         requestReadPermission();
+        replaceFragment(photosFragment, R.id.btnPhotos);
     }
 
     private void addEvents() {
@@ -48,11 +49,11 @@ public class MainActivity extends AppCompatActivity {
                         int id = item.getItemId();
                         if(id != currentButton){
                             switch (id){
-                                case R.id.btnAlbums:
-                                    replaceFragment(albumsFragment, R.id.btnAlbums);
-                                    break;
                                 case R.id.btnPhotos:
                                     replaceFragment(photosFragment, R.id.btnPhotos);
+                                    break;
+                                case R.id.btnAlbums:
+                                    replaceFragment(albumsFragment, R.id.btnAlbums);
                                     break;
                                 case R.id.btnSearch:
                                     replaceFragment(searchFragment, R.id.btnSearch);
@@ -81,7 +82,7 @@ public class MainActivity extends AppCompatActivity {
                                            @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         if(checkReadPermission() == PackageManager.PERMISSION_GRANTED){
-            replaceFragment(new AlbumsFragment(), R.id.btnAlbums);
+            replaceFragment(photosFragment, R.id.btnPhotos);
             getAlbum();
         }
     }

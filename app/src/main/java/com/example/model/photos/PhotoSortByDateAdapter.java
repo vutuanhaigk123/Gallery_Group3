@@ -33,6 +33,7 @@ public class PhotoSortByDateAdapter extends RecyclerView.Adapter<PhotoSortByDate
         this.context = context;
         PhotoSortByDateAdapter.ogPhotoList = new PhotoList(photoList);
         createPhotoSortByDateList(photoList);
+        Collections.reverse(ogPhotoList.getPhotoList());
         this.mode = mode;
     }
 

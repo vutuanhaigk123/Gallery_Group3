@@ -7,6 +7,7 @@ import android.view.View;
 import androidx.annotation.NonNull;
 import androidx.databinding.ViewDataBinding;
 
+import com.example.view.FullscreenPhotoActivity;
 import com.example.view.databinding.LayoutFullscreenPhotoBinding;
 
 public class PhotoFullscreenViewHolder extends ViewHolder{
@@ -23,19 +24,38 @@ public class PhotoFullscreenViewHolder extends ViewHolder{
         super(fullscreenPhotoBinding.getRoot());
         this.fullscreenPhotoBinding = fullscreenPhotoBinding;
         this.photoList = photoList;
+        final boolean[] isClicked = {false};
         fullscreenPhotoBinding.imageView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                hideNavBar();
+                if(isClicked[0] == false){
+                    hideNavBar();
+                    FullscreenPhotoActivity.actionBar.hide();
+                    isClicked[0] = true;
+                }
+                else{
+                    showNavBar();
+                    FullscreenPhotoActivity.actionBar.show();
+                    isClicked[0] = false;
+                }
             }
         });
     }
     private void hideNavBar(){
-
         View decorView = ((Activity) itemView.getContext()).getWindow().getDecorView();
-        int uiOptions = View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
+        int uiOptions = View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+                | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
                 | View.SYSTEM_UI_FLAG_FULLSCREEN
-                | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION;
+                | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
+                | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY;
+        decorView.setSystemUiVisibility(uiOptions);
+    }
+    private void showNavBar(){
+        View decorView = ((Activity) itemView.getContext()).getWindow().getDecorView();
+        int uiOptions = View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+                | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+                | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+                | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY;
         decorView.setSystemUiVisibility(uiOptions);
     }
 
