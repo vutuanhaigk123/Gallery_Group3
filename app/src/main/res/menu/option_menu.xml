@@ -11,5 +11,7 @@
     <item
         android:id="@+id/mnuCopy"
         android:title="@string/mnuCopy" />
-
+    <item
+        android:id="@+id/mnuEdit"
+        android:title="@string/mnuEdit" />
 </menu>

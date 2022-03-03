@@ -1,6 +1,10 @@
 package com.example.view;
 
+import androidx.activity.result.ActivityResultCallback;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -9,12 +13,14 @@ import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.widget.Toast;
 
+import com.example.model.CropperActivity;
 import com.example.model.photos.Photo;
 import com.example.model.photos.PhotoAdapter;
 import com.example.model.photos.PhotoList;
@@ -26,6 +32,7 @@ public class FullscreenPhotoActivity extends AppCompatActivity {
     private ActivityFullscreenPhotoBinding binding;
     private PhotoAdapter photoAdapter;
     public static ActionBar actionBar;
+    ActivityResultLauncher<String> mgetContent;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -72,7 +79,19 @@ public class FullscreenPhotoActivity extends AppCompatActivity {
             case R.id.mnuCopy:
                 copyToClipboard();
                 break;
+            case R.id.mnuEdit:
+                editImage();
+//                mgetContent.launch("image/*");// lay anh
+                break;
         }
+//        mgetContent = registerForActivityResult(new ActivityResultContracts.GetContent(), new ActivityResultCallback<Uri>() {
+//            @Override
+//            public void onActivityResult(Uri result) {
+//                Intent intent = new Intent(FullscreenPhotoActivity.this, CropperActivity.class);
+//                intent.putExtra("DATA",result.toString());
+//                startActivityForResult(intent,101);
+//            }
+//        });
         return super.onOptionsItemSelected(item);
     }
 
@@ -110,5 +129,23 @@ public class FullscreenPhotoActivity extends AppCompatActivity {
         startActivity(Intent.createChooser(
                 intent, "Set image as:"));
     }
-
+    private void editImage(){
+        Intent intent = new Intent(FullscreenPhotoActivity.this, CropperActivity.class);
+        Photo currentPhoto = getCurrentPhoto();
+        Uri result  = currentPhoto.getUri(FullscreenPhotoActivity.this);
+        intent.putExtra("DATA",result.toString());
+        startActivityForResult(intent,101);
+    }
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if(resultCode == -1 &&requestCode ==101){
+            String result = data.getStringExtra("RESULT");
+            Uri resultUri = null;
+            if(result != null){
+                resultUri = Uri.parse(result);
+            }
+            //imgHInh.setImageURI(resultUri);
+        }
+    }
 }

@@ -7,4 +7,5 @@
     <string name="mnuShare">Share</string>
     <string name="mnuSetImage">Set image as…</string>
     <string name="mnuCopy">Copy to Clipboard</string>
+    <string name="mnuEdit">Edit</string>
 </resources>

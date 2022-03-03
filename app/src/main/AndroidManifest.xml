@@ -14,6 +14,9 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Gallery">
         <activity
+            android:name="com.example.model.CropperActivity"
+            android:exported="false" />
+        <activity
             android:name=".MainActivity"
             android:exported="true">
             <intent-filter>
@@ -27,9 +30,12 @@
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
             </intent-filter>
         </activity>
+        <activity
+            android:name="com.yalantis.ucrop.UCropActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme.AppCompat.Light.NoActionBar" />
 
         <provider
             android:name="androidx.core.content.FileProvider"
@@ -40,6 +46,6 @@
                 android:name="android.support.FILE_PROVIDER_PATHS"
                 android:resource="@xml/provider_paths" />
         </provider>
-</application>
+    </application>
 
 </manifest>
