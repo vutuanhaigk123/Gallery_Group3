@@ -27,13 +27,14 @@ public class PhotoSortByDateAdapter extends RecyclerView.Adapter<PhotoSortByDate
     private Context context;
     private ObservableArrayList<PhotoSortByDate> photoSortByDateList;
     public static PhotoList ogPhotoList;
+    private int layout; // 0: sắp xếp theo ngày, 1: sắp xếp theo tháng, 2: sắp xếp theo năm
     private int mode;
 
-    public PhotoSortByDateAdapter(Context context, ObservableArrayList<Photo> photoList, int mode) {
+    public PhotoSortByDateAdapter(Context context, ObservableArrayList<Photo> photoList, int mode, int layout) {
         this.context = context;
-        PhotoSortByDateAdapter.ogPhotoList = new PhotoList(photoList);
+        this.layout = layout;
+        PhotoSortByDateAdapter.ogPhotoList = new PhotoList((ObservableArrayList<Photo>) photoList.clone());
         createPhotoSortByDateList(photoList);
-        Collections.reverse(ogPhotoList.getPhotoList());
         this.mode = mode;
     }
 
@@ -49,54 +50,150 @@ public class PhotoSortByDateAdapter extends RecyclerView.Adapter<PhotoSortByDate
         return photoSortByDateList;
     }
 
-    // Hàm đổi millisecond sang dd/mm/yyyy
-    public void parseMillisecondToDate(ObservableArrayList<Photo> photoList){
-        for(int i =0 ; i < photoList.size();i++){
-            Calendar calendar = Calendar.getInstance();
-            SimpleDateFormat simpleDateFormat =
-                    new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
-            String now = simpleDateFormat.format(calendar.getTime());
-            calendar.setTimeInMillis(Long.parseLong(photoList.get(i).getDateAdded()) * 1000);
-            String date = simpleDateFormat.format(calendar.getTime());
-            photoList.get(i).setDateAdded(date);
-            if(photoList.get(i).getDateAdded().equals(now)){
-                photoList.get(i).setDateAdded("Hôm nay");
+    // Hàm đổi millisecond sang dd/mm/yyyy, mm/yyyy, yyyy
+    public void parseMillisecondToDate(ObservableArrayList<Photo> photoList, int layout){
+        if(layout == 0){
+            for(int i =0 ; i < photoList.size();i++){
+                Calendar calendar = Calendar.getInstance();
+                SimpleDateFormat simpleDateFormat =
+                        new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
+                String now = simpleDateFormat.format(calendar.getTime());
+                calendar.setTimeInMillis(Long.parseLong(photoList.get(i).getMilliseconds()) * 1000);
+                String date = simpleDateFormat.format(calendar.getTime());
+                photoList.get(i).setDateAdded(date);
+                if(photoList.get(i).getDateAdded().equals(now)){
+                    photoList.get(i).setDateAdded("Hôm nay");
+                }
+            }
+        }
+        else if(layout == 1){
+            for(int i =0 ; i < photoList.size();i++){
+                Calendar calendar = Calendar.getInstance();
+                SimpleDateFormat simpleDateFormat =
+                        new SimpleDateFormat("MM/yyyy", Locale.getDefault());
+                String now = simpleDateFormat.format(calendar.getTime());
+                calendar.setTimeInMillis(Long.parseLong(photoList.get(i).getMilliseconds()) * 1000);
+                String date = simpleDateFormat.format(calendar.getTime());
+                photoList.get(i).setDateAdded(date);
+                if(photoList.get(i).getDateAdded().equals(now)){
+                    photoList.get(i).setDateAdded("Tháng này");
+                }
+            }
+        }
+        else{
+            for(int i =0 ; i < photoList.size();i++){
+                Calendar calendar = Calendar.getInstance();
+                SimpleDateFormat simpleDateFormat =
+                        new SimpleDateFormat("yyyy", Locale.getDefault());
+                String now = simpleDateFormat.format(calendar.getTime());
+                calendar.setTimeInMillis(Long.parseLong(photoList.get(i).getMilliseconds()) * 1000);
+                String date = simpleDateFormat.format(calendar.getTime());
+                photoList.get(i).setDateAdded(date);
+                if(photoList.get(i).getDateAdded().equals(now)){
+                    photoList.get(i).setDateAdded("Năm nay");
+                }
             }
         }
     }
 
-    // Hàm sắp xếp danh sách các danh sách ảnh theo ngày
-    public void sortListPhotoByDate(ObservableArrayList<PhotoSortByDate> photoSortByDateList){
-        Collections.sort(photoSortByDateList, new Comparator<PhotoSortByDate>() {
-            @Override
-            public int compare(PhotoSortByDate t1, PhotoSortByDate t2) {
-                if(!t1.getDateAdded().equals("Hôm nay") &&
-                    !t2.getDateAdded().equals("Hôm nay")){
-                    Date d1 = null, d2 = null;
-                    try {
-                        d1 = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
-                                .parse(t1.getDateAdded());
-                        d2 = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
-                                .parse(t2.getDateAdded());
-                    } catch (ParseException e) {
-                        e.printStackTrace();
+    // Hàm sắp xếp danh sách các danh sách ảnh theo ngày, theo tháng, theo năm
+    public void sortListPhotoByDate(ObservableArrayList<PhotoSortByDate> photoSortByDateList, int layout){
+        if(layout == 0){
+            Collections.sort(photoSortByDateList, new Comparator<PhotoSortByDate>() {
+                @Override
+                public int compare(PhotoSortByDate t1, PhotoSortByDate t2) {
+                    if(!t1.getDateAdded().equals("Hôm nay") &&
+                            !t2.getDateAdded().equals("Hôm nay")){
+                        Date d1 = null, d2 = null;
+                        try {
+                            d1 = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
+                                    .parse(t1.getDateAdded());
+                            d2 = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
+                                    .parse(t2.getDateAdded());
+                        } catch (ParseException e) {
+                            e.printStackTrace();
+                        }
+                        return d1.compareTo(d2);
+
                     }
-                    return d1.compareTo(d2);
+                    else if(t1.getDateAdded().equals("Hôm nay") &&
+                            t2.getDateAdded().equals("Hôm nay")){
+                        return 0;
+                    }
+                    else if(t1.getDateAdded().equals("Hôm nay")){
+                        return 1;
+                    }
+                    else{
+                        return -1;
+                    }
 
                 }
-                else if(t1.getDateAdded().equals("Hôm nay") &&
-                        t2.getDateAdded().equals("Hôm nay")){
-                    return 0;
-                }
-                else if(t1.getDateAdded().equals("Hôm nay")){
-                    return 1;
-                }
-                else{
-                    return -1;
-                }
+            });
+        }
+        else if(layout == 1){
+            Collections.sort(photoSortByDateList, new Comparator<PhotoSortByDate>() {
+                @Override
+                public int compare(PhotoSortByDate t1, PhotoSortByDate t2) {
+                    if(!t1.getDateAdded().equals("Tháng này") &&
+                            !t2.getDateAdded().equals("Tháng này")){
+                        Date d1 = null, d2 = null;
+                        try {
+                            d1 = new SimpleDateFormat("MM/yyyy", Locale.getDefault())
+                                    .parse(t1.getDateAdded());
+                            d2 = new SimpleDateFormat("MM/yyyy", Locale.getDefault())
+                                    .parse(t2.getDateAdded());
+                        } catch (ParseException e) {
+                            e.printStackTrace();
+                        }
+                        return d1.compareTo(d2);
 
-            }
-        });
+                    }
+                    else if(t1.getDateAdded().equals("Tháng này") &&
+                            t2.getDateAdded().equals("Tháng này")){
+                        return 0;
+                    }
+                    else if(t1.getDateAdded().equals("Tháng này")){
+                        return 1;
+                    }
+                    else{
+                        return -1;
+                    }
+
+                }
+            });
+        }
+        else{
+            Collections.sort(photoSortByDateList, new Comparator<PhotoSortByDate>() {
+                @Override
+                public int compare(PhotoSortByDate t1, PhotoSortByDate t2) {
+                    if(!t1.getDateAdded().equals("Năm nay") &&
+                            !t2.getDateAdded().equals("Năm nay")){
+                        Date d1 = null, d2 = null;
+                        try {
+                            d1 = new SimpleDateFormat("yyyy", Locale.getDefault())
+                                    .parse(t1.getDateAdded());
+                            d2 = new SimpleDateFormat("yyyy", Locale.getDefault())
+                                    .parse(t2.getDateAdded());
+                        } catch (ParseException e) {
+                            e.printStackTrace();
+                        }
+                        return d1.compareTo(d2);
+
+                    }
+                    else if(t1.getDateAdded().equals("Năm nay") &&
+                            t2.getDateAdded().equals("Năm nay")){
+                        return 0;
+                    }
+                    else if(t1.getDateAdded().equals("Năm nay")){
+                        return 1;
+                    }
+                    else{
+                        return -1;
+                    }
+
+                }
+            });
+        }
     }
 
     // Hàm đảo ngược các danh sách con đã sắp xếp theo date trong danh sách hình ảnh để hình
@@ -112,7 +209,7 @@ public class PhotoSortByDateAdapter extends RecyclerView.Adapter<PhotoSortByDate
         ObservableArrayList<PhotoSortByDate> photoSortByDateList =
                 new ObservableArrayList<PhotoSortByDate>();
         String dateAdded = "";
-        parseMillisecondToDate(photoList);
+        parseMillisecondToDate(photoList, this.layout);
         for(int i = 0; i < photoList.size(); i++){
             if(!dateAdded.equals(photoList.get(i).getDateAdded())){
                 dateAdded = photoList.get(i).getDateAdded();
@@ -129,7 +226,7 @@ public class PhotoSortByDateAdapter extends RecyclerView.Adapter<PhotoSortByDate
                 photoSortByDateList.add(temp);
             }
         }
-        sortListPhotoByDate(photoSortByDateList);
+        sortListPhotoByDate(photoSortByDateList,this.layout);
         Collections.reverse(photoSortByDateList);
         reversePhotoList(photoSortByDateList);
         this.photoSortByDateList = photoSortByDateList;

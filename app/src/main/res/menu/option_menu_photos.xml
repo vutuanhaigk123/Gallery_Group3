@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/mnu_photos_layout"
+        android:title="@string/mnuPhotosLayout">
+        <menu>
+            <item
+                android:id="@+id/photosmnu_sortByDate"
+                android:title="@string/photomnu_sortByDate"/>
+            <item
+                android:id="@+id/photosmnu_sortByMonth"
+                android:title="@string/photomnu_sortByMonth"/>
+            <item
+                android:id="@+id/photosmnu_sortByYear"
+                android:title="@string/photomnu_sortByYear"/>
+        </menu>
+    </item>
+</menu>

@@ -17,6 +17,7 @@ import java.io.Serializable;
 public class Photo implements Serializable {
     private String path;
     private String dateAdded;
+    private String milliseconds;
     private String mimeType;
     private String filename;
     private int index;
@@ -25,10 +26,19 @@ public class Photo implements Serializable {
                  String mimeType, String filename,
                  int index) {
         this.path = path;
+        this.milliseconds = dateAdded;
         this.dateAdded = dateAdded;
         this.mimeType = mimeType;
         this.filename = filename;
         this.index = index;
+    }
+
+    public String getMilliseconds() {
+        return milliseconds;
+    }
+
+    public void setMilliseconds(String milliseconds) {
+        this.milliseconds = milliseconds;
     }
 
     public String getPath() {
