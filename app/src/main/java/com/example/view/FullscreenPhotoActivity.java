@@ -1,8 +1,6 @@
 package com.example.view;
 
-import androidx.activity.result.ActivityResultCallback;
 import androidx.activity.result.ActivityResultLauncher;
-import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBar;
@@ -32,11 +30,12 @@ public class FullscreenPhotoActivity extends AppCompatActivity {
     private ActivityFullscreenPhotoBinding binding;
     private PhotoAdapter photoAdapter;
     public static ActionBar actionBar;
-    ActivityResultLauncher<String> mgetContent;
+//    ActivityResultLauncher<String> mgetContent;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        MainActivity.makeFullScreen(getWindow());
         binding = ActivityFullscreenPhotoBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
         Intent intent = getIntent();
@@ -44,6 +43,9 @@ public class FullscreenPhotoActivity extends AppCompatActivity {
         PhotoList photoList = (PhotoList) intent.getSerializableExtra("photoList");
         photoAdapter = new PhotoAdapter( photoList,
                 PhotoAdapter.FULLSCREEN_MODE);
+
+
+
         binding.viewPager.setAdapter(photoAdapter);
         binding.viewPager.post(new Runnable() {
             @Override
@@ -52,7 +54,11 @@ public class FullscreenPhotoActivity extends AppCompatActivity {
             }
         });
         actionBar = getSupportActionBar();
-        actionBar.setDisplayHomeAsUpEnabled(true);
+        if(actionBar != null){
+            actionBar.setDisplayHomeAsUpEnabled(true);
+        }
+
+
     }
 
     // Option Menu
@@ -148,4 +154,5 @@ public class FullscreenPhotoActivity extends AppCompatActivity {
             //imgHInh.setImageURI(resultUri);
         }
     }
+
 }

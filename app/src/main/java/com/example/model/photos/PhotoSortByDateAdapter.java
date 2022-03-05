@@ -1,8 +1,8 @@
 package com.example.model.photos;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.view.LayoutInflater;
-import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
@@ -11,9 +11,8 @@ import androidx.databinding.ObservableArrayList;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.view.R;
+import com.example.view.PhotosFragment;
 import com.example.view.databinding.LayoutPhotoByDateAddedBinding;
-import com.example.view.databinding.LayoutPhotoThumbnailBinding;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -38,12 +37,21 @@ public class PhotoSortByDateAdapter extends RecyclerView.Adapter<PhotoSortByDate
         this.mode = mode;
     }
 
+    private void initPhotoAdapter(ObservableArrayList<Photo> photoList){
+        createPhotoSortByDateList(photoList);
+        Collections.reverse(ogPhotoList.getPhotoList());
+    }
+
     public PhotoList getOgPhotoList() {
         return ogPhotoList;
     }
 
+    @SuppressLint("NotifyDataSetChanged")
     public void setOgPhotoList(PhotoList ogPhotoList) {
-        this.ogPhotoList = ogPhotoList;
+        ObservableArrayList<Photo> photoList = ogPhotoList.getPhotoList();
+        PhotoSortByDateAdapter.ogPhotoList = new PhotoList((ObservableArrayList<Photo>) photoList.clone());
+        initPhotoAdapter(ogPhotoList.getPhotoList());
+        notifyDataSetChanged();
     }
 
     public ObservableArrayList<PhotoSortByDate> getPhotoList() {
@@ -52,46 +60,41 @@ public class PhotoSortByDateAdapter extends RecyclerView.Adapter<PhotoSortByDate
 
     // Hàm đổi millisecond sang dd/mm/yyyy, mm/yyyy, yyyy
     public void parseMillisecondToDate(ObservableArrayList<Photo> photoList, int layout){
-        if(layout == 0){
-            for(int i =0 ; i < photoList.size();i++){
-                Calendar calendar = Calendar.getInstance();
-                SimpleDateFormat simpleDateFormat =
-                        new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
-                String now = simpleDateFormat.format(calendar.getTime());
-                calendar.setTimeInMillis(Long.parseLong(photoList.get(i).getMilliseconds()) * 1000);
-                String date = simpleDateFormat.format(calendar.getTime());
-                photoList.get(i).setDateAdded(date);
-                if(photoList.get(i).getDateAdded().equals(now)){
-                    photoList.get(i).setDateAdded("Hôm nay");
-                }
-            }
+        Calendar calendar = Calendar.getInstance();
+        SimpleDateFormat simpleDateFormat =
+                new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
+        String now = simpleDateFormat.format(calendar.getTime());
+        if(layout == PhotosFragment.LAYOUT_SORT_BY_DATE){
+            simpleDateFormat =
+                    new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
+            now = simpleDateFormat.format(calendar.getTime());
         }
-        else if(layout == 1){
-            for(int i =0 ; i < photoList.size();i++){
-                Calendar calendar = Calendar.getInstance();
-                SimpleDateFormat simpleDateFormat =
-                        new SimpleDateFormat("MM/yyyy", Locale.getDefault());
-                String now = simpleDateFormat.format(calendar.getTime());
-                calendar.setTimeInMillis(Long.parseLong(photoList.get(i).getMilliseconds()) * 1000);
-                String date = simpleDateFormat.format(calendar.getTime());
-                photoList.get(i).setDateAdded(date);
-                if(photoList.get(i).getDateAdded().equals(now)){
-                    photoList.get(i).setDateAdded("Tháng này");
-                }
-            }
+        else if(layout == PhotosFragment.LAYOUT_SORT_BY_MONTH){
+            simpleDateFormat =
+                    new SimpleDateFormat("MM/yyyy", Locale.getDefault());
+            now = simpleDateFormat.format(calendar.getTime());
+
         }
         else{
-            for(int i =0 ; i < photoList.size();i++){
-                Calendar calendar = Calendar.getInstance();
-                SimpleDateFormat simpleDateFormat =
+                simpleDateFormat =
                         new SimpleDateFormat("yyyy", Locale.getDefault());
-                String now = simpleDateFormat.format(calendar.getTime());
-                calendar.setTimeInMillis(Long.parseLong(photoList.get(i).getMilliseconds()) * 1000);
-                String date = simpleDateFormat.format(calendar.getTime());
-                photoList.get(i).setDateAdded(date);
-                if(photoList.get(i).getDateAdded().equals(now)){
+                now = simpleDateFormat.format(calendar.getTime());
+        }
+        for(int i = 0 ; i < photoList.size(); i++){
+            calendar.setTimeInMillis(Long.parseLong(photoList.get(i).getMilliseconds()) * 1000);
+            String date = simpleDateFormat.format(calendar.getTime());
+            photoList.get(i).setDateAdded(date);
+            if(photoList.get(i).getDateAdded().equals(now)){
+                if(layout == PhotosFragment.LAYOUT_SORT_BY_DATE){
+                    photoList.get(i).setDateAdded("Hôm nay");
+                }
+                else if(layout == PhotosFragment.LAYOUT_SORT_BY_MONTH){
+                    photoList.get(i).setDateAdded("Tháng này");
+                }
+                else{
                     photoList.get(i).setDateAdded("Năm nay");
                 }
+
             }
         }
     }

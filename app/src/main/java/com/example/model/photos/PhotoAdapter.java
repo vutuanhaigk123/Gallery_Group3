@@ -1,11 +1,9 @@
 package com.example.model.photos;
 
 import android.view.LayoutInflater;
-import android.view.View;
 import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
-import androidx.databinding.ObservableArrayList;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.view.databinding.LayoutFullscreenPhotoBinding;
@@ -37,14 +35,13 @@ public class PhotoAdapter extends RecyclerView.Adapter<ViewHolder> {
             );
             return new PhotoViewHolder(photoRowBinding, photoList);
         }
-        else if(mode == FULLSCREEN_MODE){
+        // mode == FULLSCREEN_MODE
+        else {
             LayoutFullscreenPhotoBinding fullscreenPhotoBinding = LayoutFullscreenPhotoBinding.inflate(
                     layoutInflater, parent, false
             );
             return new PhotoFullscreenViewHolder(fullscreenPhotoBinding, photoList);
         }
-
-        return new PhotoViewHolder(null, photoList);
     }
 
     @Override
@@ -60,6 +57,7 @@ public class PhotoAdapter extends RecyclerView.Adapter<ViewHolder> {
             LayoutFullscreenPhotoBinding binding =
                     ((LayoutFullscreenPhotoBinding)holder.getBinding());
             binding.setPhoto(photo);
+//            binding.imageView.setImage(ImageSource.uri(photo.getPath()));
             binding.executePendingBindings();
         }
     }

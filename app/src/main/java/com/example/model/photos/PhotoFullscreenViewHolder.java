@@ -14,6 +14,7 @@ public class PhotoFullscreenViewHolder extends ViewHolder{
     LayoutFullscreenPhotoBinding fullscreenPhotoBinding;
     PhotoList photoList;
 
+
     @Override
     public ViewDataBinding getBinding() {
         return fullscreenPhotoBinding;
@@ -24,7 +25,8 @@ public class PhotoFullscreenViewHolder extends ViewHolder{
         super(fullscreenPhotoBinding.getRoot());
         this.fullscreenPhotoBinding = fullscreenPhotoBinding;
         this.photoList = photoList;
-        final boolean[] isClicked = {false};
+        final boolean[] isClicked = {true};
+        hideNavBar();
         fullscreenPhotoBinding.imageView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -41,7 +43,7 @@ public class PhotoFullscreenViewHolder extends ViewHolder{
             }
         });
     }
-    private void hideNavBar(){
+    public void hideNavBar(){
         View decorView = ((Activity) itemView.getContext()).getWindow().getDecorView();
         int uiOptions = View.SYSTEM_UI_FLAG_LAYOUT_STABLE
                 | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
@@ -50,7 +52,7 @@ public class PhotoFullscreenViewHolder extends ViewHolder{
                 | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY;
         decorView.setSystemUiVisibility(uiOptions);
     }
-    private void showNavBar(){
+    public void showNavBar(){
         View decorView = ((Activity) itemView.getContext()).getWindow().getDecorView();
         int uiOptions = View.SYSTEM_UI_FLAG_LAYOUT_STABLE
                 | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
@@ -58,6 +60,5 @@ public class PhotoFullscreenViewHolder extends ViewHolder{
                 | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY;
         decorView.setSystemUiVisibility(uiOptions);
     }
-
 
 }

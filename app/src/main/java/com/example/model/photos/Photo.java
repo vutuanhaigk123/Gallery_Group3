@@ -1,14 +1,22 @@
 package com.example.model.photos;
 
 import android.content.Context;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.widget.ImageView;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.core.content.FileProvider;
 import androidx.databinding.BindingAdapter;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.request.RequestOptions;
+import com.bumptech.glide.request.target.SimpleTarget;
+import com.bumptech.glide.request.transition.Transition;
+import com.davemorrissey.labs.subscaleview.ImageSource;
+import com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView;
 import com.example.view.BuildConfig;
 
 import java.io.File;
@@ -87,10 +95,19 @@ public class Photo implements Serializable {
     }
 
     @BindingAdapter("android:loadImage")
-    public static void loadImage(ImageView imageView,String imageUrl){
-        Glide.with(imageView.getContext())
+    public static void loadImage(SubsamplingScaleImageView view, String imageUrl){
+//        Glide.with(imageView.getContext())
+//                .load(imageUrl)
+//                .into(imageView);
+        Glide.with(view.getContext())
                 .load(imageUrl)
-                .into(imageView);
+                .apply(RequestOptions.diskCacheStrategyOf(DiskCacheStrategy.AUTOMATIC))
+                .into(new SimpleTarget<Drawable>() {
+                    @Override
+                    public void onResourceReady(@NonNull Drawable resource, @Nullable Transition<? super Drawable> transition) {
+                        view.setImage(ImageSource.uri(imageUrl));
+                    }
+                });
     }
 
     @BindingAdapter("android:loadThumb")
@@ -99,6 +116,8 @@ public class Photo implements Serializable {
                 .load(imageUrl)
                 .thumbnail(0.1f)
                 .apply(RequestOptions.centerCropTransform())
+                .apply(RequestOptions.diskCacheStrategyOf(DiskCacheStrategy.AUTOMATIC))
                 .into(imageView);
     }
+
 }

@@ -3,11 +3,10 @@ package com.example.view;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
-import androidx.databinding.ObservableArrayList;
 import androidx.fragment.app.Fragment;
-import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -16,7 +15,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.example.model.photos.Photo;
 import com.example.model.photos.PhotoAdapter;
 import com.example.model.photos.PhotoList;
 import com.example.model.photos.PhotoSortByDateAdapter;
@@ -37,9 +35,11 @@ public class PhotosFragment extends Fragment {
     private static final String ARG_PARAM2 = "param2";
     private FragmentPhotosBinding binding;
     private PhotoList photoList;
-    private final int LAYOUT_SORT_BY_DATE = 0;
-    private final int LAYOUT_SORT_BY_MONTH = 1;
-    private final int LAYOUT_SORT_BY_YEAR = 2;
+    private PhotoSortByDateAdapter photoSortByAdapter;
+    public static final int LAYOUT_SORT_BY_DATE = 0;
+    public static final int LAYOUT_SORT_BY_MONTH = 1;
+    public static final int LAYOUT_SORT_BY_YEAR = 2;
+    private int currentLayout;
 
     // TODO: Rename and change types of parameters
     private String mParam1;
@@ -86,17 +86,30 @@ public class PhotosFragment extends Fragment {
         binding.recyclerView.setLayoutManager( new LinearLayoutManager(
                 container.getContext(),
                 RecyclerView.VERTICAL,false));
-        PhotoSortByDateAdapter photoSortByDateAdapter = new PhotoSortByDateAdapter(
+        currentLayout = LAYOUT_SORT_BY_DATE;
+        photoSortByAdapter = new PhotoSortByDateAdapter(
                 container.getContext(),
                 photoList.getPhotoList(),
-                PhotoAdapter.THUMBNAIL_MODE,LAYOUT_SORT_BY_DATE);
+                PhotoAdapter.THUMBNAIL_MODE, currentLayout);
         Collections.reverse(PhotoSortByDateAdapter.ogPhotoList.getPhotoList());
-        binding.recyclerView.setAdapter(photoSortByDateAdapter);
+        binding.recyclerView.setAdapter(photoSortByAdapter);
 //        binding.recyclerView.addItemDecoration(
 //                new DividerItemDecoration(container.getContext(),
 //                        DividerItemDecoration.VERTICAL));
 
+        binding.swipeRefresh.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                updateAdapterData();
+            }
+        });
         return binding.getRoot();
+    }
+
+    private void updateAdapterData(){
+        photoList = new PhotoList(PhotoList.readMediaStore(getContext()));
+        photoSortByAdapter.setOgPhotoList(photoList);
+        binding.swipeRefresh.setRefreshing(false);
     }
 
     @Override
@@ -108,36 +121,33 @@ public class PhotosFragment extends Fragment {
 
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        int layout = -1;
         switch (item.getItemId()){
             case R.id.photosmnu_sortByDate:
-//                photoList = new PhotoList(PhotoList.readMediaStore(getContext()));
-                PhotoSortByDateAdapter photoSortByDateAdapter = new PhotoSortByDateAdapter(
-                        getContext(),
-                        photoList.getPhotoList(),
-                        PhotoAdapter.THUMBNAIL_MODE,LAYOUT_SORT_BY_DATE);
-                binding.recyclerView.swapAdapter(photoSortByDateAdapter,false);
-                Collections.reverse(PhotoSortByDateAdapter.ogPhotoList.getPhotoList());
+                layout = PhotosFragment.LAYOUT_SORT_BY_DATE;
                 break;
             case R.id.photosmnu_sortByMonth:
-//                photoList = new PhotoList(PhotoList.readMediaStore(getContext()));
-                PhotoSortByDateAdapter photoSortByMonthAdapter = new PhotoSortByDateAdapter(
-                        getContext(),
-                        photoList.getPhotoList(),
-                        PhotoAdapter.THUMBNAIL_MODE,LAYOUT_SORT_BY_MONTH);
-                binding.recyclerView.swapAdapter(photoSortByMonthAdapter,false);
-                Collections.reverse(PhotoSortByDateAdapter.ogPhotoList.getPhotoList());
+                layout = PhotosFragment.LAYOUT_SORT_BY_MONTH;
                 break;
             case R.id.photosmnu_sortByYear:
-//                photoList = new PhotoList(PhotoList.readMediaStore(getContext()));
-                PhotoSortByDateAdapter photoSortByYearAdapter = new PhotoSortByDateAdapter(
-                        getContext(),
-                        photoList.getPhotoList(),
-                        PhotoAdapter.THUMBNAIL_MODE,LAYOUT_SORT_BY_YEAR);
-                binding.recyclerView.swapAdapter(photoSortByYearAdapter,false);
-                Collections.reverse(PhotoSortByDateAdapter.ogPhotoList.getPhotoList());
+                layout = PhotosFragment.LAYOUT_SORT_BY_YEAR;
                 break;
         }
+
+        if(layout != -1 && layout != currentLayout){
+            currentLayout = layout;
+            photoSortByAdapter = new PhotoSortByDateAdapter(
+                    getContext(),
+                    photoList.getPhotoList(),
+                    PhotoAdapter.THUMBNAIL_MODE, layout);
+            binding.recyclerView.swapAdapter(photoSortByAdapter,false);
+            Collections.reverse(PhotoSortByDateAdapter.ogPhotoList.getPhotoList());
+        }
+
         return super.onOptionsItemSelected(item);
     }
+
+
+
 
 }
