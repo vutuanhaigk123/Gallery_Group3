@@ -1,6 +1,5 @@
 package com.example.view;
 
-import androidx.activity.result.ActivityResultLauncher;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBar;
@@ -18,12 +17,15 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.widget.Toast;
 
-import com.example.model.CropperActivity;
 import com.example.model.photos.Photo;
 import com.example.model.photos.PhotoAdapter;
 import com.example.model.photos.PhotoList;
 
 import com.example.view.databinding.ActivityFullscreenPhotoBinding;
+import com.yalantis.ucrop.UCrop;
+
+import java.io.File;
+import java.util.UUID;
 
 public class FullscreenPhotoActivity extends AppCompatActivity {
 
@@ -87,17 +89,8 @@ public class FullscreenPhotoActivity extends AppCompatActivity {
                 break;
             case R.id.mnuEdit:
                 editImage();
-//                mgetContent.launch("image/*");// lay anh
                 break;
         }
-//        mgetContent = registerForActivityResult(new ActivityResultContracts.GetContent(), new ActivityResultCallback<Uri>() {
-//            @Override
-//            public void onActivityResult(Uri result) {
-//                Intent intent = new Intent(FullscreenPhotoActivity.this, CropperActivity.class);
-//                intent.putExtra("DATA",result.toString());
-//                startActivityForResult(intent,101);
-//            }
-//        });
         return super.onOptionsItemSelected(item);
     }
 
@@ -136,22 +129,25 @@ public class FullscreenPhotoActivity extends AppCompatActivity {
                 intent, "Set image as:"));
     }
     private void editImage(){
-        Intent intent = new Intent(FullscreenPhotoActivity.this, CropperActivity.class);
         Photo currentPhoto = getCurrentPhoto();
         Uri result  = currentPhoto.getUri(FullscreenPhotoActivity.this);
-        intent.putExtra("DATA",result.toString());
-        startActivityForResult(intent,101);
+        String dest_url = new StringBuilder(UUID.randomUUID().toString()).append(".png").toString();
+        UCrop.Options options = new UCrop.Options();
+        UCrop.of(result, Uri.fromFile(new File(getCacheDir(),dest_url)))
+                .withOptions(options).withAspectRatio(0,0)
+                .withMaxResultSize(2000,2000).start(FullscreenPhotoActivity.this);
     }
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+
         super.onActivityResult(requestCode, resultCode, data);
-        if(resultCode == -1 &&requestCode ==101){
-            String result = data.getStringExtra("RESULT");
-            Uri resultUri = null;
-            if(result != null){
-                resultUri = Uri.parse(result);
-            }
-            //imgHInh.setImageURI(resultUri);
+        if(resultCode == RESULT_OK && requestCode==UCrop.REQUEST_CROP &&data!=null){
+            final Uri resultUri = UCrop.getOutput(data);
+
+            Toast.makeText(this, resultUri + "", Toast.LENGTH_SHORT).show();
+        }
+        else if(resultCode == UCrop.RESULT_ERROR){
+            final Throwable cropError = UCrop.getError(data);
         }
     }
 
