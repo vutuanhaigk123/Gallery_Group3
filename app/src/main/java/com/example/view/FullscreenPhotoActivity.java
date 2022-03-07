@@ -3,18 +3,23 @@ package com.example.view;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.annotation.SuppressLint;
+import android.app.Dialog;
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.Window;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.model.photos.Photo;
@@ -22,10 +27,12 @@ import com.example.model.photos.PhotoAdapter;
 import com.example.model.photos.PhotoList;
 
 import com.example.view.databinding.ActivityFullscreenPhotoBinding;
+import com.example.view.databinding.LayoutInfomationImageBinding;
 import com.yalantis.ucrop.UCrop;
 
 import java.io.File;
 import java.util.UUID;
+import java.util.zip.Inflater;
 
 public class FullscreenPhotoActivity extends AppCompatActivity {
 
@@ -90,8 +97,31 @@ public class FullscreenPhotoActivity extends AppCompatActivity {
             case R.id.mnuEdit:
                 editImage();
                 break;
+            case R.id.mnuInfo:
+                infoImage();
+                break;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    private void infoImage() {
+
+        Photo photo = getCurrentPhoto();
+
+        LayoutInfomationImageBinding layoutInfomationImageBinding = LayoutInfomationImageBinding.inflate(getLayoutInflater());
+        Dialog dialog = new Dialog(binding.getRoot().getContext());
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        dialog.setCancelable(true);
+
+        layoutInfomationImageBinding.typeImage.setText(photoAdapter.getPhotoList().get(binding.viewPager.getCurrentItem()).getMimeType());
+        layoutInfomationImageBinding.filenameImage.setText(photoAdapter.getPhotoList().get(binding.viewPager.getCurrentItem()).getFilename());
+        layoutInfomationImageBinding.dateImage.setText(photoAdapter.getPhotoList().get(binding.viewPager.getCurrentItem()).getDateAdded());
+
+
+
+        dialog.setContentView(layoutInfomationImageBinding.getRoot());
+
+        dialog.show();
     }
 
     private void copyToClipboard() {

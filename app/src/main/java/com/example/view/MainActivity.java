@@ -121,8 +121,8 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public static void makeFullScreen(Window window) {
-        window.requestFeature(Window.FEATURE_NO_TITLE);
-        window.setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
-                WindowManager.LayoutParams.FLAG_FULLSCREEN);
+//        window.requestFeature(Window.FEATURE_NO_TITLE);
+//        window.setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
+//                WindowManager.LayoutParams.FLAG_FULLSCREEN);
     }
 }
