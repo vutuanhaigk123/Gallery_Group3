@@ -147,7 +147,12 @@ public class PhotosFragment extends Fragment {
         return super.onOptionsItemSelected(item);
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+        updateAdapterData();
 
+    }
 
 
 }

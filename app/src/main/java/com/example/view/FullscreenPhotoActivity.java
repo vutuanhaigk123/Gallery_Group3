@@ -13,8 +13,10 @@ import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -31,6 +33,9 @@ import com.example.view.databinding.LayoutInfomationImageBinding;
 import com.yalantis.ucrop.UCrop;
 
 import java.io.File;
+import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.UUID;
 import java.util.zip.Inflater;
 
@@ -39,8 +44,7 @@ public class FullscreenPhotoActivity extends AppCompatActivity {
     private ActivityFullscreenPhotoBinding binding;
     private PhotoAdapter photoAdapter;
     public static ActionBar actionBar;
-//    ActivityResultLauncher<String> mgetContent;
-
+    private PhotoList photoList;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -49,7 +53,7 @@ public class FullscreenPhotoActivity extends AppCompatActivity {
         setContentView(binding.getRoot());
         Intent intent = getIntent();
         int pos = intent.getIntExtra("pos", 0);
-        PhotoList photoList = (PhotoList) intent.getSerializableExtra("photoList");
+        photoList = (PhotoList) intent.getSerializableExtra("photoList");
         photoAdapter = new PhotoAdapter( photoList,
                 PhotoAdapter.FULLSCREEN_MODE);
 
@@ -167,18 +171,55 @@ public class FullscreenPhotoActivity extends AppCompatActivity {
                 .withOptions(options).withAspectRatio(0,0)
                 .withMaxResultSize(2000,2000).start(FullscreenPhotoActivity.this);
     }
+    private void saveToGallery(Uri uri) throws IOException {
+
+
+        Bitmap bitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), uri);
+        MediaStore.Images.Media.insertImage(getContentResolver(), bitmap, "newImg" , "After Edit");
+    }
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
 
         super.onActivityResult(requestCode, resultCode, data);
         if(resultCode == RESULT_OK && requestCode==UCrop.REQUEST_CROP &&data!=null){
-            final Uri resultUri = UCrop.getOutput(data);
+            Uri resultUri = UCrop.getOutput(data);
+            String []split = resultUri.toString().split("/");
+            String filename = "";//lấy tên file
+            for(int i = 0;i<split.length - 1;i++){
+                filename+=split[i] + "/";
+            }
+            // lấy ngày hiện tại để lưu ảnh
+            Date date = new Date();
+            SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
+            String strDate = formatter.format(date);
+            Toast.makeText(this, strDate, Toast.LENGTH_SHORT).show();
 
-            Toast.makeText(this, resultUri + "", Toast.LENGTH_SHORT).show();
+            Photo photo = new Photo(resultUri.toString(),"08/03/2022","img/png",split[split.length - 1],photoList.size());
+
+            //thêm ảnh sau chỉnh sửa vào list
+            photoList.getPhotoList().add(0, photo);//thêm vào đầu
+            photoAdapter.notifyDataSetChanged();
+            binding.viewPager.post(new Runnable() {
+                @Override
+                public void run() {
+                    binding.viewPager.setCurrentItem(0 );
+                }//hiển thị ảnh đầu
+            });
+            try {
+                saveToGallery(resultUri);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            if(photo == null){
+                Toast.makeText(this, "photo is null", Toast.LENGTH_SHORT).show();
+
+            }
+
         }
         else if(resultCode == UCrop.RESULT_ERROR){
             final Throwable cropError = UCrop.getError(data);
         }
     }
+
 
 }
