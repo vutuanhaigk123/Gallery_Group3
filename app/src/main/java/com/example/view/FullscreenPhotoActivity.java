@@ -3,27 +3,31 @@ package com.example.view;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBar;
-import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.databinding.ObservableArrayList;
 
+import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Dialog;
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.Window;
-import android.widget.TextView;
 import android.widget.Toast;
 
+import com.dsphotoeditor.sdk.activity.DsPhotoEditorActivity;
 import com.example.model.photos.Photo;
 import com.example.model.photos.PhotoAdapter;
 import com.example.model.photos.PhotoList;
@@ -35,9 +39,9 @@ import com.yalantis.ucrop.UCrop;
 import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
+import java.util.Collections;
 import java.util.Date;
 import java.util.UUID;
-import java.util.zip.Inflater;
 
 public class FullscreenPhotoActivity extends AppCompatActivity {
 
@@ -45,6 +49,10 @@ public class FullscreenPhotoActivity extends AppCompatActivity {
     private PhotoAdapter photoAdapter;
     public static ActionBar actionBar;
     private PhotoList photoList;
+    private int newImageIndex;
+    public static int EDIT_PHOTO_CODE = 202;
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -56,16 +64,11 @@ public class FullscreenPhotoActivity extends AppCompatActivity {
         photoList = (PhotoList) intent.getSerializableExtra("photoList");
         photoAdapter = new PhotoAdapter( photoList,
                 PhotoAdapter.FULLSCREEN_MODE);
-
+        newImageIndex = -1;
 
 
         binding.viewPager.setAdapter(photoAdapter);
-        binding.viewPager.post(new Runnable() {
-            @Override
-            public void run() {
-                binding.viewPager.setCurrentItem(pos);
-            }
-        });
+        jumpToPosition(pos);
         actionBar = getSupportActionBar();
         if(actionBar != null){
             actionBar.setDisplayHomeAsUpEnabled(true);
@@ -104,8 +107,18 @@ public class FullscreenPhotoActivity extends AppCompatActivity {
             case R.id.mnuInfo:
                 infoImage();
                 break;
+            case R.id.mnuEdit2:
+                editImage2();
+                break;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    private void editImage2() {
+        Intent dsPhotoEditorIntent = new Intent(this, DsPhotoEditorActivity.class);
+        dsPhotoEditorIntent.setData(getCurrentPhoto().getUri(this));
+        dsPhotoEditorIntent.putExtras(new Bundle());
+        startActivityForResult(dsPhotoEditorIntent, EDIT_PHOTO_CODE);
     }
 
     private void infoImage() {
@@ -162,6 +175,7 @@ public class FullscreenPhotoActivity extends AppCompatActivity {
         startActivity(Intent.createChooser(
                 intent, "Set image as:"));
     }
+
     private void editImage(){
         Photo currentPhoto = getCurrentPhoto();
         Uri result  = currentPhoto.getUri(FullscreenPhotoActivity.this);
@@ -171,9 +185,8 @@ public class FullscreenPhotoActivity extends AppCompatActivity {
                 .withOptions(options).withAspectRatio(0,0)
                 .withMaxResultSize(2000,2000).start(FullscreenPhotoActivity.this);
     }
+
     private void saveToGallery(Uri uri) throws IOException {
-
-
         Bitmap bitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), uri);
         MediaStore.Images.Media.insertImage(getContentResolver(), bitmap, "newImg" , "After Edit");
     }
@@ -182,6 +195,15 @@ public class FullscreenPhotoActivity extends AppCompatActivity {
 
         super.onActivityResult(requestCode, resultCode, data);
         if(resultCode == RESULT_OK && requestCode==UCrop.REQUEST_CROP &&data!=null){
+            checkImageAfterCrop(resultCode, data);
+
+        } else if(requestCode == EDIT_PHOTO_CODE){
+            checkImageAfterEdit(resultCode);
+        }
+    }
+
+    private void checkImageAfterCrop(int resultCode, @Nullable Intent data){
+        if(resultCode == RESULT_OK && data != null){
             Uri resultUri = UCrop.getOutput(data);
             String []split = resultUri.toString().split("/");
             String filename = "";//lấy tên file
@@ -199,12 +221,7 @@ public class FullscreenPhotoActivity extends AppCompatActivity {
             //thêm ảnh sau chỉnh sửa vào list
             photoList.getPhotoList().add(0, photo);//thêm vào đầu
             photoAdapter.notifyDataSetChanged();
-            binding.viewPager.post(new Runnable() {
-                @Override
-                public void run() {
-                    binding.viewPager.setCurrentItem(0 );
-                }//hiển thị ảnh đầu
-            });
+            newImageIndex = 0;
             try {
                 saveToGallery(resultUri);
             } catch (IOException e) {
@@ -214,12 +231,42 @@ public class FullscreenPhotoActivity extends AppCompatActivity {
                 Toast.makeText(this, "photo is null", Toast.LENGTH_SHORT).show();
 
             }
-
-        }
-        else if(resultCode == UCrop.RESULT_ERROR){
+        } else if (resultCode == UCrop.RESULT_ERROR){
             final Throwable cropError = UCrop.getError(data);
         }
     }
 
+    private void checkImageAfterEdit(int resultCode){
+        if(resultCode == RESULT_OK){
+            newImageIndex = 0;
+            Toast.makeText(this, "Photo was edited", Toast.LENGTH_SHORT).show();
+        }
+    }
 
+    private void updateAdapterData() {
+        ObservableArrayList<Photo> photos = PhotoList.readMediaStore(this);
+        Collections.reverse(photos);
+        photoList = new PhotoList(photos);
+        photoAdapter.setPhotoList(photoList);
+        Log.d("debug=", photoList.size() + "");
+    }
+
+    @Override
+    protected void onPostResume() {
+        super.onPostResume();
+        updateAdapterData();
+        if(newImageIndex != -1){
+            jumpToPosition(newImageIndex);
+            newImageIndex = -1;
+        }
+    }
+
+    private void jumpToPosition(int pos){
+        binding.viewPager.post(new Runnable() {
+            @Override
+            public void run() {
+                binding.viewPager.setCurrentItem(pos);
+            }
+        });
+    }
 }

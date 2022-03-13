@@ -39,6 +39,7 @@ public class Photo implements Serializable {
         this.mimeType = mimeType;
         this.filename = filename;
         this.index = index;
+
     }
 
     public String getMilliseconds() {

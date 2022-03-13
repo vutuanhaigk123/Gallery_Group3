@@ -36,6 +36,9 @@ public class PhotoList implements Serializable {
         if(cursor != null){
             photoList = new ObservableArrayList<Photo>();
             while(cursor.moveToNext()){
+                if(cursor.getString(1) == null){
+                    continue;
+                }
                 photoList.add(new Photo(cursor.getString(3),
                         cursor.getString(1),
                         cursor.getString(2),

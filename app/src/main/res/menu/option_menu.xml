@@ -17,4 +17,7 @@
     <item
         android:id="@+id/mnuInfo"
         android:title="Get Info" />
+    <item
+        android:id="@+id/mnuEdit2"
+        android:title="Edit 2" />
 </menu>

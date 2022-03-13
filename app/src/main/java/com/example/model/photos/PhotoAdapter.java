@@ -1,9 +1,11 @@
 package com.example.model.photos;
 
+import android.annotation.SuppressLint;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
+import androidx.databinding.ObservableArrayList;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.view.databinding.LayoutFullscreenPhotoBinding;
@@ -65,5 +67,11 @@ public class PhotoAdapter extends RecyclerView.Adapter<ViewHolder> {
     @Override
     public int getItemCount() {
         return photoList.size();
+    }
+
+    @SuppressLint("NotifyDataSetChanged")
+    public void setPhotoList(PhotoList photoList) {
+        this.photoList = new PhotoList((ObservableArrayList<Photo>) photoList.getPhotoList().clone());
+        notifyDataSetChanged();
     }
 }
