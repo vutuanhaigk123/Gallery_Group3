@@ -20,6 +20,7 @@ import com.example.model.photos.PhotoList;
 import com.example.model.photos.PhotoSortByDateAdapter;
 import com.example.view.databinding.FragmentPhotosBinding;
 
+import java.util.ArrayList;
 import java.util.Collections;
 
 /**
@@ -33,13 +34,16 @@ public class PhotosFragment extends Fragment {
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
-    private FragmentPhotosBinding binding;
+    public static FragmentPhotosBinding binding;
     private PhotoList photoList;
     private PhotoSortByDateAdapter photoSortByAdapter;
     public static final int LAYOUT_SORT_BY_DATE = 0;
     public static final int LAYOUT_SORT_BY_MONTH = 1;
     public static final int LAYOUT_SORT_BY_YEAR = 2;
     private int currentLayout;
+
+    public static boolean isEnable = false;
+    public static final ArrayList<String> selectList = new ArrayList<>();
 
     // TODO: Rename and change types of parameters
     private String mParam1;

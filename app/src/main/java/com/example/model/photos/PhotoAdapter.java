@@ -1,15 +1,25 @@
 package com.example.model.photos;
 
 import android.annotation.SuppressLint;
+import android.graphics.Color;
+import android.view.ActionMode;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
+import android.view.View;
 import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.databinding.ObservableArrayList;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.view.R;
 import com.example.view.databinding.LayoutFullscreenPhotoBinding;
 import com.example.view.databinding.LayoutPhotoThumbnailBinding;
+
+import java.util.ArrayList;
 
 public class PhotoAdapter extends RecyclerView.Adapter<ViewHolder> {
     private PhotoList photoList;
@@ -54,6 +64,61 @@ public class PhotoAdapter extends RecyclerView.Adapter<ViewHolder> {
                     ((LayoutPhotoThumbnailBinding)holder.getBinding());
             binding.setPhoto(photo);
             binding.executePendingBindings();
+
+//            binding.imageView.setOnLongClickListener(new View.OnLongClickListener() {
+//                @Override
+//                public boolean onLongClick(View view) {
+//                    if(!isEnable) {
+//                        ActionMode.Callback callback = new ActionMode.Callback() {
+//                            @Override
+//                            public boolean onCreateActionMode(ActionMode actionMode, Menu menu) {
+//                                MenuInflater menuInflater = actionMode.getMenuInflater();
+//                                menuInflater.inflate(R.menu.option_menu_long_click, menu);
+//
+//                                return true;
+//                            }
+//
+//                            @Override
+//                            public boolean onPrepareActionMode(ActionMode actionMode, Menu menu) {
+//                                isEnable = true;
+//                                ClickItem(binding, holder);
+//
+//                                return true;
+//                            }
+//
+//                            @Override
+//                            public boolean onActionItemClicked(ActionMode actionMode, MenuItem menuItem) {
+//                                int id = menuItem.getItemId();
+//
+//                                switch (id) {
+//                                    case R.id.test:
+//                                        for (int i = 0; i < selectList.size(); i++) {
+//                                            System.out.println(photoList.get(selectList.get(i)));
+//                                        }
+//                                        break;
+//                                }
+//                                return true;
+//                            }
+//
+//                            @Override
+//                            public void onDestroyActionMode(ActionMode actionMode) {
+//
+//                            }
+//                        };
+//                        ((AppCompatActivity) view.getContext()).startActionMode(callback);
+//                    }
+//                    return true;
+//                }
+//            });
+
+//            binding.imageView.setOnClickListener(new View.OnClickListener() {
+//                @Override
+//                public void onClick(View view) {
+//                    if(isEnable) {
+//                        ClickItem(binding, holder);
+//                    }
+//                }
+//            });
         }
         else if(mode == FULLSCREEN_MODE){
             LayoutFullscreenPhotoBinding binding =
@@ -63,6 +128,21 @@ public class PhotoAdapter extends RecyclerView.Adapter<ViewHolder> {
             binding.executePendingBindings();
         }
     }
+
+//    private void ClickItem(LayoutPhotoThumbnailBinding binding, ViewHolder holder) {
+//        int s = binding.getPhoto().getIndex();
+//
+//        if(binding.ivCheckBox.getVisibility() == View.GONE) {
+//            binding.ivCheckBox.setVisibility(View.VISIBLE);
+//            selectList.add(s);
+//        }
+//        else {
+//            binding.ivCheckBox.setVisibility(View.GONE);
+//            binding.ivCheckBox.setBackgroundColor(Color.TRANSPARENT);
+//            selectList.remove(s);
+//        }
+//    }
+
 
     @Override
     public int getItemCount() {
