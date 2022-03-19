@@ -3,6 +3,7 @@ package com.example.view;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
+import androidx.databinding.ObservableArrayList;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -15,6 +16,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.example.model.photos.Photo;
 import com.example.model.photos.PhotoAdapter;
 import com.example.model.photos.PhotoList;
 import com.example.model.photos.PhotoSortByDateAdapter;
@@ -34,7 +36,7 @@ public class PhotosFragment extends Fragment {
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
-    public static FragmentPhotosBinding binding;
+    private FragmentPhotosBinding binding;
     private PhotoList photoList;
     private PhotoSortByDateAdapter photoSortByAdapter;
     public static final int LAYOUT_SORT_BY_DATE = 0;
@@ -43,7 +45,8 @@ public class PhotosFragment extends Fragment {
     private int currentLayout;
 
     public static boolean isEnable = false;
-    public static final ArrayList<String> selectList = new ArrayList<>();
+    public static boolean isSelectAll = false;
+    public static ObservableArrayList<Photo> selectedList = new ObservableArrayList<>();
 
     // TODO: Rename and change types of parameters
     private String mParam1;

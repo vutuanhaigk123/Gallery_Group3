@@ -21,6 +21,7 @@ import android.view.WindowManager;
 import android.widget.ProgressBar;
 
 import com.example.view.databinding.ActivityMainBinding;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigation.NavigationBarView;
 
 public class MainActivity extends AppCompatActivity {
@@ -30,12 +31,14 @@ public class MainActivity extends AppCompatActivity {
     private PhotosFragment photosFragment;
     private SearchFragment searchFragment;
     private int currentButton;
+    public static BottomNavigationView bottomNavigationView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         makeFullScreen(getWindow());
         binding = ActivityMainBinding.inflate(getLayoutInflater());
+        bottomNavigationView = binding.bottomNavigationView2;
         setContentView(binding.getRoot());
         AppCompatDelegate.setDefaultNightMode(MODE_NIGHT_YES);
         addControls();

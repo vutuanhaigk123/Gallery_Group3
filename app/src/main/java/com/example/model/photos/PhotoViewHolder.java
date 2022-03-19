@@ -44,59 +44,6 @@ public class PhotoViewHolder extends ViewHolder {
                 }
             }
         });
-
-        photoRowBinding.imageView.setOnLongClickListener(new View.OnLongClickListener() {
-            @Override
-            public boolean onLongClick(View view) {
-                if(!PhotosFragment.isEnable) {
-                    ActionMode.Callback callback = new ActionMode.Callback() {
-                        @Override
-                        public boolean onCreateActionMode(ActionMode actionMode, Menu menu) {
-                            MenuInflater menuInflater = actionMode.getMenuInflater();
-                            menuInflater.inflate(R.menu.option_menu_long_click, menu);
-
-                            return true;
-                        }
-
-                        @Override
-                        public boolean onPrepareActionMode(ActionMode actionMode, Menu menu) {
-                            PhotosFragment.isEnable = true;
-                            ClickItem(photoRowBinding);
-
-                            return true;
-                        }
-
-                        @Override
-                        public boolean onActionItemClicked(ActionMode actionMode, MenuItem menuItem) {
-                            int id = menuItem.getItemId();
-
-                            switch (id) {
-                                case R.id.test:
-//                                    System.out.println(PhotosFragment.selectList);
-                                    break;
-                            }
-                            return true;
-                        }
-
-                        @Override
-                        public void onDestroyActionMode(ActionMode actionMode) {
-
-                            for (int i =0 ; i < PhotosFragment.binding.recyclerView.getChildCount();i++){
-                                View viewItem = PhotosFragment.binding.recyclerView.getLayoutManager().findViewByPosition(i);
-                                RecyclerView recyclerView= viewItem.findViewById(R.id.rvPhotoGrid);
-                                for (int j = 0 ; j < recyclerView.getChildCount();j++){
-                                    recyclerView.getLayoutManager().getChildAt(j).findViewById(R.id.iv_check_box).setVisibility(View.GONE);
-                                }
-                            }
-                            PhotosFragment.isEnable = false;
-                            PhotosFragment.selectList.clear();
-                        }
-                    };
-                    ((AppCompatActivity) view.getContext()).startActionMode(callback);
-                }
-                return true;
-            }
-        });
     }
 
     @Override
@@ -114,17 +61,24 @@ public class PhotoViewHolder extends ViewHolder {
 
     }
 
-    private void ClickItem(LayoutPhotoThumbnailBinding binding) {
-        String s = Integer.toBinaryString(binding.getPhoto().getIndex());
-
-        if(binding.ivCheckBox.getVisibility() == View.GONE) {
-            binding.ivCheckBox.setVisibility(View.VISIBLE);
-            PhotosFragment.selectList.add(s);
+    public void ClickItem(LayoutPhotoThumbnailBinding layoutPhotoByDateAddedBinding) {
+        Photo photoTemp = layoutPhotoByDateAddedBinding.getPhoto();
+        if(photoRowBinding.icCheck.getVisibility() == View.GONE){
+            // Khi hình ảnh chưa được chọn
+            layoutPhotoByDateAddedBinding.getPhoto().setClicked(true);
+            photoRowBinding.icCheck.setVisibility(View.VISIBLE);
+            PhotosFragment.selectedList.add(photoTemp);
         }
-        else {
-            binding.ivCheckBox.setVisibility(View.GONE);
-            binding.ivCheckBox.setBackgroundColor(Color.TRANSPARENT);
-            PhotosFragment.selectList.remove(s);
+        else{
+            // Khi hình ảnh đã được chọn
+            layoutPhotoByDateAddedBinding.getPhoto().setClicked(false);
+            photoRowBinding.icCheck.setVisibility(View.GONE);
+            PhotosFragment.selectedList.remove(photoTemp);
         }
+        for (int i=0; i < PhotosFragment.selectedList.size();i++){
+            System.out.println(PhotosFragment.selectedList.get(i).getFilename());
+        }
+        System.out.println("-------------------------");
+        //Set text
     }
 }

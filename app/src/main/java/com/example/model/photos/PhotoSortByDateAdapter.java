@@ -2,16 +2,27 @@ package com.example.model.photos;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.graphics.Color;
+import android.view.ActionMode;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
+import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewTreeObserver;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.databinding.ObservableArrayList;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.model.CustomImageView;
+import com.example.view.MainActivity;
 import com.example.view.PhotosFragment;
+import com.example.view.R;
 import com.example.view.databinding.LayoutPhotoByDateAddedBinding;
 
 import java.text.ParseException;
@@ -266,7 +277,173 @@ public class PhotoSortByDateAdapter extends RecyclerView.Adapter<PhotoSortByDate
         PhotoAdapter photoAdapter = new PhotoAdapter(
                 photoSortByDate.getPhotoSortByDateList(), this.mode);
         binding.rvPhotoGrid.setAdapter(photoAdapter);
+        binding.rvPhotoGrid.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+            @Override
+            public void onGlobalLayout() {
+                for(int i =0; i < binding.rvPhotoGrid.getChildCount();i++){
+                    int finalI = i;
+                    binding.rvPhotoGrid.getLayoutManager().getChildAt(i).findViewById(R.id.imageView).setOnLongClickListener(new View.OnLongClickListener() {
+                        @Override
+                        public boolean onLongClick(View view) {
+                            if(!PhotosFragment.isEnable){
+                                // Khi action mode chưa được khởi động
+                                // Khởi tạo action mode
+                                ActionMode.Callback callback = new ActionMode.Callback() {
+                                    @Override
+                                    public boolean onCreateActionMode(ActionMode actionMode, Menu menu) {
+                                        MenuInflater menuInflater = actionMode.getMenuInflater();
+                                        menuInflater.inflate(R.menu.action_mode_menu,menu);
+                                        actionMode.setTitle("Choose your option");
+                                        return true;
+                                    }
 
+                                    @Override
+                                    public boolean onPrepareActionMode(ActionMode actionMode, Menu menu) {
+                                        // Khi action mode đã được chuẩn bị
+                                        MainActivity.bottomNavigationView.setVisibility(View.GONE);
+                                        PhotosFragment.isEnable = true;
+                                        ClickItem(binding,finalI);
+                                        notifyDataSetChanged();
+                                        return false;
+                                    }
+
+                                    @Override
+                                    public boolean onActionItemClicked(ActionMode actionMode, MenuItem menuItem) {
+                                        // Khi click action mode item
+                                        switch (menuItem.getItemId()){
+                                            case R.id.acm_delete:
+//                                                for(Photo photo: PhotosFragment.selectedList){
+//                                                    photoList.getPhotoList().remove(photo);
+//                                                }
+//                                                if(photoList.getPhotoList().size() == 0){
+//                                                    // TO DO
+//                                                }
+                                                actionMode.finish();
+                                                break;
+                                            case R.id.acm_select_all:
+                                                if(PhotosFragment.selectedList.size() == ogPhotoList.getPhotoList().size()){
+                                                    // Khi tất cả hình ảnh đã được chọn
+                                                    for (int i =0 ; i < photoSortByDateList.size();i++){
+                                                        for (int j = 0 ; j < photoSortByDateList.get(i).getPhotoSortByDateList().size();j++){
+                                                            photoSortByDateList.get(i).getPhotoSortByDateList().getPhotoList().get(j).setClicked(false);
+                                                        }
+                                                    }
+                                                    PhotosFragment.isSelectAll = false;
+                                                    // Bỏ tất cả ảnh đã chọn
+                                                    PhotosFragment.selectedList.clear();
+                                                    notifyDataSetChanged();
+                                                }
+                                                else{
+                                                    // Khi tất cả hình ảnh chưa được chọn hết
+                                                    for (int i =0 ; i < photoSortByDateList.size();i++){
+                                                        for (int j = 0 ; j < photoSortByDateList.get(i).getPhotoSortByDateList().size();j++){
+                                                            photoSortByDateList.get(i).getPhotoSortByDateList().getPhotoList().get(j).setClicked(true);
+                                                        }
+                                                    }
+                                                    PhotosFragment.isSelectAll = true;
+                                                    // Bỏ tất cả ảnh đã chọn
+                                                    PhotosFragment.selectedList.clear();
+                                                    // Thêm tất cả ảnh vào danh sách được chọn
+                                                    PhotosFragment.selectedList.addAll(ogPhotoList.getPhotoList());
+                                                    notifyDataSetChanged();
+                                                }
+                                                break;
+                                        }
+                                        return false;
+                                    }
+
+                                    @Override
+                                    public void onDestroyActionMode(ActionMode actionMode) {
+                                        // Khi action mode bị huỷ
+                                        PhotosFragment.isEnable = false;
+                                        PhotosFragment.isSelectAll = false;
+                                        PhotosFragment.selectedList.clear();
+                                        notifyDataSetChanged();
+                                    }
+                                };
+                                ((AppCompatActivity)view.getContext()).startActionMode(callback);
+                            }else{
+                                // Khi action mode đã được bật
+                                ClickItem(binding,finalI);
+                                notifyDataSetChanged();
+                            }
+                            return true;
+                        }
+                    });
+                }
+                binding.rvPhotoGrid.getViewTreeObserver().removeOnGlobalLayoutListener(this);
+
+                if(PhotosFragment.isEnable){
+                    for (int j = 0 ; j < binding.rvPhotoGrid.getChildCount();j++){
+                        ((CustomImageView)binding.rvPhotoGrid.getLayoutManager().getChildAt(j).findViewById(R.id.imageView)).setColorFilter(Color.parseColor("#40000000"));
+                        binding.rvPhotoGrid.getLayoutManager().getChildAt(j).findViewById(R.id.icUnCheck).setVisibility(View.VISIBLE);
+                    }
+                }
+                if(PhotosFragment.isSelectAll){
+                    for (int j = 0 ; j < binding.rvPhotoGrid.getChildCount();j++){
+                        binding.rvPhotoGrid.getLayoutManager().getChildAt(j).findViewById(R.id.icCheck).setVisibility(View.VISIBLE);
+                    }
+                }
+                else{
+                    for (int j = 0 ; j < binding.rvPhotoGrid.getChildCount();j++){
+                        binding.rvPhotoGrid.getLayoutManager().getChildAt(j).findViewById(R.id.icCheck).setVisibility(View.GONE);
+                    }
+                }
+                if(PhotosFragment.isSelectAll){
+                    for (int j = 0 ; j < binding.rvPhotoGrid.getChildCount();j++){
+                        if(photoSortByDate.getPhotoSortByDateList().getPhotoList().get(j).isClicked()){
+                            binding.rvPhotoGrid.getLayoutManager().getChildAt(j).findViewById(R.id.icCheck).setVisibility(View.VISIBLE);
+                        }
+                        else{
+                            binding.rvPhotoGrid.getLayoutManager().getChildAt(j).findViewById(R.id.icCheck).setVisibility(View.GONE);
+                        }
+                    }
+                }
+
+                if(PhotosFragment.isEnable){
+                    for (int i = 0; i < photoSortByDate.getPhotoSortByDateList().getPhotoList().size();i++){
+                        if(photoSortByDate.getPhotoSortByDateList().getPhotoList().get(i).isClicked()){
+                            binding.rvPhotoGrid.getLayoutManager().getChildAt(i).findViewById(R.id.icCheck).setVisibility(View.VISIBLE);
+                        }
+                    }
+                }
+                if(!PhotosFragment.isEnable){
+                    for (int i = 0; i < photoSortByDate.getPhotoSortByDateList().getPhotoList().size();i++){
+                        if(photoSortByDate.getPhotoSortByDateList().getPhotoList().get(i).isClicked()){
+                            binding.rvPhotoGrid.getLayoutManager().getChildAt(i).findViewById(R.id.icCheck).setVisibility(View.GONE);
+                            photoSortByDate.getPhotoSortByDateList().getPhotoList().get(i).setClicked(false);
+                        }
+                    }
+                }
+            }
+        });
+
+    }
+
+    public void ClickItem( LayoutPhotoByDateAddedBinding layoutPhotoByDateAddedBinding, int position) {
+//        Photo photoTemp = layoutPhotoByDateAddedBinding.getPhoto().getPhotoSortByDateList().getPhotoList().get(position);
+        Photo photoTemp = layoutPhotoByDateAddedBinding.getPhoto().getPhotoSortByDateList().getPhotoList().get(position);
+        View icCheck = layoutPhotoByDateAddedBinding.rvPhotoGrid.getLayoutManager().getChildAt(position).findViewById(R.id.icCheck);
+        View icUnCheck = layoutPhotoByDateAddedBinding.rvPhotoGrid.getLayoutManager().getChildAt(position).findViewById(R.id.icUnCheck);
+        if(icCheck.getVisibility() == View.GONE){
+            // Khi hình ảnh chưa được chọn
+            layoutPhotoByDateAddedBinding.getPhoto().getPhotoSortByDateList().getPhotoList().get(position).setClicked(true);
+            icCheck.setVisibility(View.VISIBLE);
+            icUnCheck.setVisibility(View.GONE);
+            PhotosFragment.selectedList.add(photoTemp);
+        }
+        else{
+            layoutPhotoByDateAddedBinding.getPhoto().getPhotoSortByDateList().getPhotoList().get(position).setClicked(false);
+            // Khi hình ảnh đã được chọn
+            icCheck.setVisibility(View.GONE);
+            icUnCheck.setVisibility(View.VISIBLE);
+            PhotosFragment.selectedList.remove(photoTemp);
+        }
+        for (int i=0; i < PhotosFragment.selectedList.size();i++){
+            System.out.println(PhotosFragment.selectedList.get(i).getFilename());
+        }
+        System.out.println("-------------------------");
+        //Set text
     }
 
     @Override
@@ -275,6 +452,7 @@ public class PhotoSortByDateAdapter extends RecyclerView.Adapter<PhotoSortByDate
             return photoSortByDateList.size();
         return 0;
     }
+
 
     public class PhotoSortByDateViewHolder extends RecyclerView.ViewHolder{
         private TextView dateAdded;

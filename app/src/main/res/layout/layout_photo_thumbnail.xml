@@ -9,7 +9,7 @@
             type="com.example.model.photos.Photo" />
     </data>
 
-    <com.google.android.material.circularreveal.CircularRevealRelativeLayout
+    <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:layout_constraintDimensionRatio="1:1">
@@ -27,16 +27,29 @@
             tools:srcCompat="@tools:sample/avatars" />
 
         <ImageView
-            android:id="@+id/iv_check_box"
+            android:id="@+id/icCheck"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:src="@drawable/ic_check"
             android:visibility="gone"
+            android:layout_centerInParent="true"
+            app:layout_constraintBottom_toTopOf="parent"
+            app:layout_constraintEnd_toStartOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            ></ImageView>
+        <ImageView
+            android:id="@+id/icUnCheck"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_baseline_radio_button_unchecked_24"
+            android:visibility="gone"
+            android:layout_centerInParent="true"
             app:layout_constraintBottom_toTopOf="parent"
             app:layout_constraintEnd_toStartOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             ></ImageView>
 
-    </com.google.android.material.circularreveal.CircularRevealRelativeLayout>
+    </RelativeLayout>
 </layout>

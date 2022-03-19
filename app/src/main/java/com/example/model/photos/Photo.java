@@ -29,6 +29,7 @@ public class Photo implements Serializable {
     private String mimeType;
     private String filename;
     private int index;
+    private boolean isClicked = false;
 
     public Photo(String path, String dateAdded,
                  String mimeType, String filename,
@@ -40,6 +41,14 @@ public class Photo implements Serializable {
         this.filename = filename;
         this.index = index;
 
+    }
+
+    public boolean isClicked() {
+        return isClicked;
+    }
+
+    public void setClicked(boolean clicked) {
+        isClicked = clicked;
     }
 
     public String getMilliseconds() {
