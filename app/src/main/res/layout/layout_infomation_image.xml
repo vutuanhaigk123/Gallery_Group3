@@ -3,18 +3,18 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:padding="12dp">
-    <TableLayout
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:stretchColumns="1"
-        android:shrinkColumns="0"
+        android:orientation="vertical"
         >
-        <TableRow
-            android:layout_width="match_parent"
-            android:layout_height="fill_parent">
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
 
             <TextView
-                android:layout_width="200dp"
+                android:layout_width="100dp"
                 android:layout_height="match_parent"
                 android:text="Type"></TextView>
 
@@ -23,14 +23,14 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 ></TextView>
-        </TableRow>
-
-        <TableRow
-            android:layout_width="match_parent"
-            android:layout_height="fill_parent">
+        </LinearLayout>
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
 
             <TextView
-                android:layout_width="200dp"
+                android:layout_width="100dp"
                 android:layout_height="match_parent"
                 android:text="Date Added"></TextView>
 
@@ -39,13 +39,14 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 ></TextView>
-        </TableRow>
-        <TableRow
-            android:layout_width="match_parent"
-            android:layout_height="fill_parent">
+        </LinearLayout>
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
 
             <TextView
-                android:layout_width="200dp"
+                android:layout_width="100dp"
                 android:layout_height="match_parent"
                 android:text="Filename"></TextView>
 
@@ -54,6 +55,6 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 ></TextView>
-        </TableRow>
-    </TableLayout>
+        </LinearLayout>
+    </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

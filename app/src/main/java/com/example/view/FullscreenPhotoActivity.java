@@ -39,8 +39,10 @@ import com.yalantis.ucrop.UCrop;
 import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
+import java.util.Locale;
 import java.util.UUID;
 
 public class FullscreenPhotoActivity extends AppCompatActivity {
@@ -125,6 +127,15 @@ public class FullscreenPhotoActivity extends AppCompatActivity {
 
         Photo photo = getCurrentPhoto();
 
+        String date = photoAdapter.getPhotoList().get(binding.viewPager.getCurrentItem()).getDateAdded();
+
+        SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
+
+        // Create a calendar object that will convert the date and time value in milliseconds to date.
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTimeInMillis(Long.parseLong(date) * 1000);
+        date = formatter.format(calendar.getTime());
+
         LayoutInfomationImageBinding layoutInfomationImageBinding = LayoutInfomationImageBinding.inflate(getLayoutInflater());
         Dialog dialog = new Dialog(binding.getRoot().getContext());
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
@@ -132,7 +143,7 @@ public class FullscreenPhotoActivity extends AppCompatActivity {
 
         layoutInfomationImageBinding.typeImage.setText(photoAdapter.getPhotoList().get(binding.viewPager.getCurrentItem()).getMimeType());
         layoutInfomationImageBinding.filenameImage.setText(photoAdapter.getPhotoList().get(binding.viewPager.getCurrentItem()).getFilename());
-        layoutInfomationImageBinding.dateImage.setText(photoAdapter.getPhotoList().get(binding.viewPager.getCurrentItem()).getDateAdded());
+        layoutInfomationImageBinding.dateImage.setText(date);
 
 
 
