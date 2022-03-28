@@ -13,16 +13,25 @@ import androidx.fragment.app.FragmentTransaction;
 
 import android.Manifest;
 import android.content.pm.PackageManager;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.ProgressBar;
+import android.widget.Toast;
 
 import com.example.view.databinding.ActivityMainBinding;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigation.NavigationBarView;
+
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 
 public class MainActivity extends AppCompatActivity {
     private ProgressBar pgBar;
@@ -31,11 +40,17 @@ public class MainActivity extends AppCompatActivity {
     private PhotosFragment photosFragment;
     private SearchFragment searchFragment;
     private int currentButton;
+    private String DB_NAME = "DBGallery.db";
+    private String DB_PATH = "/databases/";// lưu trữ trong thư mục cài đặt gốc
+    public  static SQLiteDatabase database = null;
     public static BottomNavigationView bottomNavigationView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        //lần đầu thì copy
+        copyDatabaseFromAssets();
+        database = openOrCreateDatabase(DB_NAME, MODE_PRIVATE, null);
         makeFullScreen(getWindow());
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         bottomNavigationView = binding.bottomNavigationView2;
@@ -127,5 +142,41 @@ public class MainActivity extends AppCompatActivity {
 //        window.requestFeature(Window.FEATURE_NO_TITLE);
 //        window.setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
 //                WindowManager.LayoutParams.FLAG_FULLSCREEN);
+    }
+    private void copyDatabase(){
+        try {
+            InputStream inputStream = getAssets().open(DB_NAME);
+            String outputFileName = getApplicationInfo().dataDir + DB_PATH + DB_NAME;// nơi lưu trữ
+            File file = new File(getApplicationInfo().dataDir + DB_PATH);
+            if(!file.exists()){
+                file.mkdir();
+            }
+            OutputStream outputStream = new FileOutputStream(outputFileName);
+
+            //chép dữ liệu
+            byte[] buffer = new byte[1024];
+            int len;
+            while((len = inputStream.read(buffer)) > 0){
+                outputStream.write(buffer,0,len);
+            };
+            outputStream.flush();
+            inputStream.close();
+            outputStream.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+            Log.e("ERROR","Lỗi sao chép");
+        }
+    }
+    private void copyDatabaseFromAssets(){
+        File dbFile = getDatabasePath(DB_NAME);
+        //nếu db chưa tồn tại thì sao chép vào, không thì xóa sao chép lại.
+        if(!dbFile.exists()){
+            copyDatabase();
+            Toast.makeText(this, "Successfull copy!", Toast.LENGTH_SHORT).show();
+        }
+        else{
+            dbFile.delete();
+            copyDatabase();
+        }
     }
 }

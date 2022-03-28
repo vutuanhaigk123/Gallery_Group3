@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <ImageView
+        android:id="@+id/imgAvtAlbumCustom"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:padding="10dp" />
+
+    <TextView
+        android:id="@+id/txtNameAlbumCustom"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:layout_marginLeft="10dp"
+        android:layout_toRightOf="@+id/imgAvtAlbumCustom"
+        android:text="Name"
+        android:textColor="#fff"
+        android:textSize="20sp"
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/txtQuantityPhotoCustom"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/txtNameAlbumCustom"
+        android:layout_marginLeft="10dp"
+
+        android:layout_marginTop="10dp"
+        android:layout_toRightOf="@+id/imgAvtAlbumCustom"
+        android:text="0"
+        android:textColor="#BCFFFFFF"
+        android:textSize="16sp" />
+</RelativeLayout>

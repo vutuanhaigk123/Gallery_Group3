@@ -358,6 +358,7 @@ public class PhotoSortByDateAdapter extends RecyclerView.Adapter<PhotoSortByDate
                                         PhotosFragment.isEnable = false;
                                         PhotosFragment.isSelectAll = false;
                                         PhotosFragment.selectedList.clear();
+                                        MainActivity.bottomNavigationView.setVisibility(View.VISIBLE);
                                         notifyDataSetChanged();
                                     }
                                 };

@@ -10,6 +10,11 @@
     <string name="mnuSetImage">Set image as…</string>
     <string name="mnuCopy">Copy to Clipboard</string>
     <string name="mnuEdit">Edit</string>
+    <string name="mnuDel">Delete</string>
+    <string name="mnuRename">Rename</string>
+    <string name="mnuAddAlbum">Create new album</string>
+    <string name="mnuLike">Yêu thích</string>
+    <string name="mnuAddToAlbum">Thêm vào Album</string>
 
     <string name="photomnu_sortByDate">Sort by date</string>
     <string name="photomnu_sortByMonth">Sort by month</string>

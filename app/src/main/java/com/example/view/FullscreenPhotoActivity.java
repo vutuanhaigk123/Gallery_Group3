@@ -9,10 +9,13 @@ import androidx.databinding.ObservableArrayList;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
+import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.ClipData;
 import android.content.ClipboardManager;
+import android.content.ContentResolver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
@@ -21,13 +24,22 @@ import android.os.Build;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.View;
 import android.view.Window;
+import android.widget.AdapterView;
+import android.widget.Button;
+import android.widget.ListView;
 import android.widget.Toast;
 
 import com.dsphotoeditor.sdk.activity.DsPhotoEditorActivity;
+import com.example.model.albums.Album;
+import com.example.model.albums.AlbumRoute;
+import com.example.model.albums.CustomAlbumDialogAdapter;
+import com.example.model.albums.SingleAlbumCustom;
 import com.example.model.photos.Photo;
 import com.example.model.photos.PhotoAdapter;
 import com.example.model.photos.PhotoList;
@@ -111,6 +123,18 @@ public class FullscreenPhotoActivity extends AppCompatActivity {
                 break;
             case R.id.mnuEdit2:
                 editImage2();
+                break;
+            case R.id.mnuDel:
+                delImage();
+                break;
+            case R.id.mnuRename:
+                //renameImage();
+                break;
+            case R.id.mnuLike:
+                addToFavoriteAlbum();
+                break;
+            case R.id.mnuAddToAlbum:
+                addToAlbum();
                 break;
         }
         return super.onOptionsItemSelected(item);
@@ -279,5 +303,149 @@ public class FullscreenPhotoActivity extends AppCompatActivity {
                 binding.viewPager.setCurrentItem(pos);
             }
         });
+    }
+    public static int deleteFileFromMediaStore(final ContentResolver contentResolver, final File file) {
+        String canonicalPath;
+        try {
+            canonicalPath = file.getCanonicalPath();
+        } catch (IOException e) {
+            canonicalPath = file.getAbsolutePath();
+        }
+        final Uri uri = MediaStore.Files.getContentUri("external");
+        final int result = contentResolver.delete(uri,
+                MediaStore.Files.FileColumns.DATA + "=?", new String[]{canonicalPath});
+        if (result == 0) {
+            final String absolutePath = file.getAbsolutePath();
+            if (!absolutePath.equals(canonicalPath)) {
+                int deletedRow = contentResolver.delete(uri,
+                        MediaStore.Files.FileColumns.DATA + "=?", new String[]{absolutePath});
+                return deletedRow;
+            }
+        } else return result;
+        return result;
+    }
+    private void delImage(){
+        final AlertDialog.Builder deleteDialog = new AlertDialog.Builder(FullscreenPhotoActivity.this);
+        deleteDialog.setTitle("Xóa ảnh");
+        deleteDialog.setMessage("Bạn có chắc chắn muốn xóa ảnh này không?");
+        deleteDialog.setPositiveButton("Có", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                Photo current = getCurrentPhoto();
+                String path = current.getPath();
+                File file = new File(path);
+                Toast.makeText(FullscreenPhotoActivity.this, deleteFileFromMediaStore(getContentResolver(), file) + "", Toast.LENGTH_SHORT).show();
+
+//                File file = new File(path);
+//                Toast.makeText(FullscreenPhotoActivity.this, file.getPath(), Toast.LENGTH_SHORT).show();
+//                if(file.delete())
+//                    Toast.makeText(FullscreenPhotoActivity.this, "Đã xóa!", Toast.LENGTH_SHORT).show();
+//                else Toast.makeText(FullscreenPhotoActivity.this, "Xóa thất bại!", Toast.LENGTH_SHORT).show();
+//                Context context = FullscreenPhotoActivity.this;
+//                context.sendBroadcast(new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE, Uri.fromFile(new File(path))));
+
+            }
+        });
+        deleteDialog.setNegativeButton("Không", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+
+            }
+        });
+        deleteDialog.show();
+    }
+    private void addToFavoriteAlbum(){
+        Photo photo = getCurrentPhoto();
+        int id_album = 1;//id_album yeu thisch = 1
+        int id_photo = AlbumRoute.findIdByNamePhotos(photo.getFilename());
+        if(id_photo == -1){
+            AlbumRoute.addToPhoto(photo);// thêm photo vào bảng photos trước khi đưa vào album_photo
+            AlbumRoute.addPhotoToAlbum(AlbumRoute.findIdByNamePhotos(photo.getFilename())
+                    ,id_album);
+            Toast.makeText(FullscreenPhotoActivity.this, "Đã yêu thích ", Toast.LENGTH_SHORT).show();
+        }
+        else{
+            boolean isPhotoInAlbum = AlbumRoute.isPhotoInAlbum(id_photo,id_album);
+            if(isPhotoInAlbum == true){
+                Toast.makeText(FullscreenPhotoActivity.this, "Đã tồn tại", Toast.LENGTH_SHORT).show();
+            }
+            else {
+                AlbumRoute.addPhotoToAlbum(AlbumRoute.findIdByNamePhotos(photo.getFilename())
+                        ,id_album);
+                Toast.makeText(FullscreenPhotoActivity.this, "Đã yêu thích ", Toast.LENGTH_SHORT).show();
+            }
+        }
+    }
+    private ObservableArrayList<SingleAlbumCustom> getInfoAlbum(){
+        ObservableArrayList<SingleAlbumCustom> result = new ObservableArrayList<>();
+        ObservableArrayList<Album> albums = AlbumRoute.getAlbumList();
+        int index = 0;
+        for(int i = 0; i < albums.size(); i++){
+            int id_album = albums.get(i).getId();
+
+            int quan = AlbumRoute.getNumberOfPhotoInAlbum(id_album);
+            int id_photo = AlbumRoute.getFirstPhotoInAlbum(id_album);
+            Photo photo = AlbumRoute.getPhotoById(id_photo);
+            Uri uri;
+            if(photo != null ){
+                uri = photo.getUri(this);
+            }
+            else uri = null;
+            if(id_album!=2 && id_album != 1 ){
+                SingleAlbumCustom albumCustom = new SingleAlbumCustom(albums.get(i).getName(),uri,quan, index++);
+                result.add(albumCustom);
+            }
+        }
+        return result;
+    }
+    private void openAlbumDialog(){
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        LayoutInflater inflater = (LayoutInflater) this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        View row = inflater.inflate(R.layout.custom_album_listview,null);
+        ListView lvAlbum = (ListView) row.findViewById(R.id.lvAlbumCustom);
+        Button btnCancel = (Button) row.findViewById(R.id.btnCancelAddAlbum);
+        ObservableArrayList<SingleAlbumCustom> infoAlbum = getInfoAlbum();
+        CustomAlbumDialogAdapter adapter = new CustomAlbumDialogAdapter(this,infoAlbum,R.layout.row_album);
+        lvAlbum.setAdapter(adapter);
+        builder.setView(row);
+        AlertDialog dialog = builder.create();
+        dialog.show();
+        btnCancel.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                dialog.dismiss();
+            }
+        });
+        lvAlbum.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                //Toast.makeText(FullscreenPhotoActivity.this, infoAlbum.get(i).getName(), Toast.LENGTH_SHORT).show();
+                String name_album = infoAlbum.get(i).getName();
+                int id_album = AlbumRoute.findIdByNameAlbum(name_album);
+                Photo photo = getCurrentPhoto();
+                int id_photo = AlbumRoute.findIdByNamePhotos(photo.getFilename());
+                if(id_photo == -1){
+                    AlbumRoute.addToPhoto(photo);// thêm photo vào bảng photos trước khi đưa vào album_photo
+                    AlbumRoute.addPhotoToAlbum(AlbumRoute.findIdByNamePhotos(photo.getFilename())
+                            ,id_album);
+                    Toast.makeText(FullscreenPhotoActivity.this, "Đã thêm vào " + name_album, Toast.LENGTH_SHORT).show();
+                }
+                else{
+                    boolean isPhotoInAlbum = AlbumRoute.isPhotoInAlbum(id_photo,id_album);
+                    if(isPhotoInAlbum == true){
+                        Toast.makeText(FullscreenPhotoActivity.this, "Đã tồn tại trong " + name_album, Toast.LENGTH_SHORT).show();
+                    }
+                    else {
+                        AlbumRoute.addPhotoToAlbum(AlbumRoute.findIdByNamePhotos(photo.getFilename())
+                                ,id_album);
+                        Toast.makeText(FullscreenPhotoActivity.this, "Đã thêm vào " + name_album, Toast.LENGTH_SHORT).show();
+                    }
+                }
+                dialog.dismiss();
+            }
+        });
+    }
+    private void addToAlbum(){
+        openAlbumDialog();
     }
 }
