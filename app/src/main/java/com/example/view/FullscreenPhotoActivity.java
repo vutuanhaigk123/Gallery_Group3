@@ -124,12 +124,12 @@ public class FullscreenPhotoActivity extends AppCompatActivity {
             case R.id.mnuEdit2:
                 editImage2();
                 break;
-            case R.id.mnuDel:
-                delImage();
-                break;
-            case R.id.mnuRename:
-                //renameImage();
-                break;
+//            case R.id.mnuDel:
+//                delImage();
+//                break;
+//            case R.id.mnuRename:
+//                //renameImage();
+//                break;
             case R.id.mnuLike:
                 addToFavoriteAlbum();
                 break;
@@ -249,9 +249,8 @@ public class FullscreenPhotoActivity extends AppCompatActivity {
             Date date = new Date();
             SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
             String strDate = formatter.format(date);
-            Toast.makeText(this, strDate, Toast.LENGTH_SHORT).show();
 
-            Photo photo = new Photo(resultUri.toString(),"08/03/2022","img/png",split[split.length - 1],photoList.size());
+            Photo photo = new Photo(resultUri.toString(),strDate,"img/png",split[split.length - 1],photoList.size());
 
             //thêm ảnh sau chỉnh sửa vào list
             photoList.getPhotoList().add(0, photo);//thêm vào đầu

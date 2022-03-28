@@ -2,6 +2,7 @@ package com.example.model.photos;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Color;
 import android.view.ActionMode;
 import android.view.LayoutInflater;
@@ -12,6 +13,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -20,6 +22,7 @@ import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.model.CustomImageView;
+import com.example.view.CollageImage;
 import com.example.view.MainActivity;
 import com.example.view.PhotosFragment;
 import com.example.view.R;
@@ -27,6 +30,7 @@ import com.example.view.databinding.LayoutPhotoByDateAddedBinding;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.Comparator;
@@ -300,10 +304,13 @@ public class PhotoSortByDateAdapter extends RecyclerView.Adapter<PhotoSortByDate
                                     @Override
                                     public boolean onPrepareActionMode(ActionMode actionMode, Menu menu) {
                                         // Khi action mode đã được chuẩn bị
-                                        MainActivity.bottomNavigationView.setVisibility(View.GONE);
-                                        PhotosFragment.isEnable = true;
-                                        ClickItem(binding,finalI);
-                                        notifyDataSetChanged();
+                                        if(!PhotosFragment.isEnable){
+                                            MainActivity.bottomNavigationView.setVisibility(View.GONE);
+                                            PhotosFragment.isEnable = true;
+                                            ClickItem(binding,finalI);
+                                            PhotosFragment.swipeRefreshLayout.setEnabled(false);
+                                            notifyDataSetChanged();
+                                        }
                                         return false;
                                     }
 
@@ -348,6 +355,21 @@ public class PhotoSortByDateAdapter extends RecyclerView.Adapter<PhotoSortByDate
                                                     notifyDataSetChanged();
                                                 }
                                                 break;
+                                            case R.id.acm_collage_image:
+                                                if(PhotosFragment.selectedList.size() < 2 || PhotosFragment.selectedList.size() > 4){
+                                                    Toast.makeText(context, "Vui lòng chọn từ 2 đến 4 ảnh", Toast.LENGTH_SHORT).show();
+                                                    break;
+                                                }
+                                                else{
+                                                    Intent intentCollageImage = new Intent(context, CollageImage.class);
+                                                    ArrayList<Photo> selectedListTemp = (ArrayList<Photo>) PhotosFragment.selectedList.clone();
+                                                    Collections.copy(selectedListTemp,PhotosFragment.selectedList);
+                                                    intentCollageImage.putExtra("numOfImg",selectedListTemp.size());
+                                                    intentCollageImage.putExtra("selectedList", selectedListTemp);
+                                                    context.startActivity(intentCollageImage);
+                                                    actionMode.finish();
+                                                    break;
+                                                }
                                         }
                                         return false;
                                     }
@@ -359,6 +381,7 @@ public class PhotoSortByDateAdapter extends RecyclerView.Adapter<PhotoSortByDate
                                         PhotosFragment.isSelectAll = false;
                                         PhotosFragment.selectedList.clear();
                                         MainActivity.bottomNavigationView.setVisibility(View.VISIBLE);
+                                        PhotosFragment.swipeRefreshLayout.setEnabled(true);
                                         notifyDataSetChanged();
                                     }
                                 };

@@ -21,12 +21,6 @@
         android:id="@+id/mnuEdit2"
         android:title="Edit 2" />
     <item
-        android:id="@+id/mnuDel"
-        android:title="@string/mnuDel" />
-    <item
-        android:id="@+id/mnuRename"
-        android:title="@string/mnuRename" />
-    <item
         android:id="@+id/mnuLike"
         android:title="@string/mnuLike" />
     <item

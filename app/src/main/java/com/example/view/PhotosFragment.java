@@ -37,13 +37,13 @@ public class PhotosFragment extends Fragment {
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
     private FragmentPhotosBinding binding;
-    private PhotoList photoList;
+    public static PhotoList photoList;
     private PhotoSortByDateAdapter photoSortByAdapter;
     public static final int LAYOUT_SORT_BY_DATE = 0;
     public static final int LAYOUT_SORT_BY_MONTH = 1;
     public static final int LAYOUT_SORT_BY_YEAR = 2;
     private int currentLayout;
-
+    public static SwipeRefreshLayout swipeRefreshLayout;
     public static boolean isEnable = false;
     public static boolean isSelectAll = false;
     public static ObservableArrayList<Photo> selectedList = new ObservableArrayList<>();
@@ -99,6 +99,7 @@ public class PhotosFragment extends Fragment {
                 photoList.getPhotoList(),
                 PhotoAdapter.THUMBNAIL_MODE, currentLayout);
         Collections.reverse(PhotoSortByDateAdapter.ogPhotoList.getPhotoList());
+        swipeRefreshLayout = binding.swipeRefresh;
         binding.recyclerView.setAdapter(photoSortByAdapter);
 //        binding.recyclerView.addItemDecoration(
 //                new DividerItemDecoration(container.getContext(),
