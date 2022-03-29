@@ -97,12 +97,12 @@ public class AlbumRoute {
     public static PhotoList getPhotoListByAlbum(int id){
         ObservableArrayList<Photo> listIdPhoto = new ObservableArrayList<>();
         Cursor cursor = MainActivity.database.rawQuery("select  * from album_photo", null);
-
+        int index = 0;
         while(cursor.moveToNext()){
             int idAlbum = cursor.getInt(0);
             int idPhoto = cursor.getInt(1);
             if(idAlbum == id){
-                listIdPhoto.add(getPhotoById(idPhoto));
+                listIdPhoto.add(getPhotoByIdAndAddIndex(idPhoto, index++));
 
             }
         }

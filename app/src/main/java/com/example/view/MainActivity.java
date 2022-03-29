@@ -169,14 +169,14 @@ public class MainActivity extends AppCompatActivity {
     }
     private void copyDatabaseFromAssets(){
         File dbFile = getDatabasePath(DB_NAME);
-        //nếu db chưa tồn tại thì sao chép vào, không thì xóa sao chép lại.
+        //nếu db chưa tồn tại thì sao chép vào, không thì thoi.
         if(!dbFile.exists()){
             copyDatabase();
             Toast.makeText(this, "Successfull copy!", Toast.LENGTH_SHORT).show();
         }
-        else{
-            dbFile.delete();
-            copyDatabase();
-        }
+//        else{
+//            dbFile.delete();
+//            copyDatabase();
+//        }
     }
 }

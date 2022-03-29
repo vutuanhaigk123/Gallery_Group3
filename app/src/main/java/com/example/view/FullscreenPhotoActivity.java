@@ -76,6 +76,10 @@ public class FullscreenPhotoActivity extends AppCompatActivity {
         Intent intent = getIntent();
         int pos = intent.getIntExtra("pos", 0);
         photoList = (PhotoList) intent.getSerializableExtra("photoList");
+//        for(int i = 0;i<photoList.size();i++){
+//            System.out.println(photoList.get(i).getIndex());
+//        }
+        System.out.println(photoList.get(5).getIndex());
         photoAdapter = new PhotoAdapter( photoList,
                 PhotoAdapter.FULLSCREEN_MODE);
         newImageIndex = -1;
@@ -278,9 +282,11 @@ public class FullscreenPhotoActivity extends AppCompatActivity {
     }
 
     private void updateAdapterData() {
-        ObservableArrayList<Photo> photos = PhotoList.readMediaStore(this);
-        Collections.reverse(photos);
-        photoList = new PhotoList(photos);
+//        ObservableArrayList<Photo> photos = PhotoList.readMediaStore(this);
+//        Collections.reverse(photos);
+//        photoList = new PhotoList(photos);
+        Intent intent = getIntent();
+        photoList = (PhotoList) intent.getSerializableExtra("photoList");
         photoAdapter.setPhotoList(photoList);
         Log.d("debug=", photoList.size() + "");
     }

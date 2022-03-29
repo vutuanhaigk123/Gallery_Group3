@@ -55,6 +55,7 @@ public class PhotoViewHolder extends ViewHolder {
         Intent intent = new Intent(photoRowBinding.getRoot().getContext(), FullscreenPhotoActivity.class);
         // Đảo ngược index để hình được thêm gần nhất xuất hiện đầu tiên trong danh sách FullScreenView
         //intent.putExtra("pos",photoList.getPhotoList().size() - 1 - photoRowBinding.getPhoto().getIndex());
+
         intent.putExtra("pos",PhotoSortByDateAdapter.ogPhotoList.size() - 1 - photoRowBinding.getPhoto().getIndex());
         intent.putExtra("photoList", PhotoSortByDateAdapter.ogPhotoList);
         photoRowBinding.getRoot().getContext().startActivity(intent);
