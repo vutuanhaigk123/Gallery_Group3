@@ -6,6 +6,7 @@ import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.databinding.ObservableArrayList;
+import androidx.viewpager2.widget.ViewPager2;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
@@ -46,6 +47,8 @@ import com.example.model.photos.PhotoList;
 
 import com.example.view.databinding.ActivityFullscreenPhotoBinding;
 import com.example.view.databinding.LayoutInfomationImageBinding;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.android.material.navigation.NavigationBarView;
 import com.yalantis.ucrop.UCrop;
 
 import java.io.File;
@@ -65,6 +68,7 @@ public class FullscreenPhotoActivity extends AppCompatActivity {
     private PhotoList photoList;
     private int newImageIndex;
     public static int EDIT_PHOTO_CODE = 202;
+    public static BottomNavigationView bottomNavigationView;
 
 
     @Override
@@ -73,6 +77,10 @@ public class FullscreenPhotoActivity extends AppCompatActivity {
         MainActivity.makeFullScreen(getWindow());
         binding = ActivityFullscreenPhotoBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
+        bottomNavigationView = binding.bottomNavigationViewFullScreen;
+        bottomNavigationView.getMenu().clear();
+        bottomNavigationView.inflateMenu(R.menu.bottom_nav_fullscrenn_menu);
+        bottomNavigationView.setItemIconTintList(null);
         Intent intent = getIntent();
         int pos = intent.getIntExtra("pos", 0);
         photoList = (PhotoList) intent.getSerializableExtra("photoList");
@@ -87,8 +95,56 @@ public class FullscreenPhotoActivity extends AppCompatActivity {
         if(actionBar != null){
             actionBar.setDisplayHomeAsUpEnabled(true);
         }
+        bottomNavigationView.setOnItemSelectedListener(new NavigationBarView.OnItemSelectedListener() {
+            @Override
+            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+                switch (item.getItemId()){
+//                    case R.id.mnuEdit:
+//                        editImage();
+//                        break;
+                    case R.id.mnuLike:
+                        int id_album = 1;//id_album yeu thisch = 1
+                        int id_photo = AlbumRoute.findIdByNamePhotos(getCurrentPhoto().getFilename());
+                        boolean isPhotoInAlbum = AlbumRoute.isPhotoInAlbum(id_photo,id_album);
+                        System.out.println(getCurrentPhoto().getFilename());
+                        System.out.println(isPhotoInAlbum);
+                        if(!isPhotoInAlbum){
+                            addToFavoriteAlbum();
+                            item.setIcon(R.drawable.ic_baseline_favorite_24);
+                        }
+                        else{
+                            // Gỡ ảnh khỏi album
+                            // TO DO
+//                            item.setIcon(R.drawable.ic_baseline_favorite_border_24);
+                        }
+                        break;
+                    case R.id.mnuEdit2:
+                        editImage2();
+                        break;
+                    case R.id.mnuDeleteImg:
+//                        delImage();
+                        break;
+                }
+                return true;
+            }
+        });
+        binding.viewPager.registerOnPageChangeCallback(new ViewPager2.OnPageChangeCallback() {
+            @Override
+            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+                super.onPageScrolled(position, positionOffset, positionOffsetPixels);
+            }
 
+            @Override
+            public void onPageSelected(int position) {
+                super.onPageSelected(position);
+                setFavCurrent();
+            }
 
+            @Override
+            public void onPageScrollStateChanged(int state) {
+                super.onPageScrollStateChanged(state);
+            }
+        });
     }
 
     // Option Menu
@@ -115,24 +171,13 @@ public class FullscreenPhotoActivity extends AppCompatActivity {
             case R.id.mnuCopy:
                 copyToClipboard();
                 break;
-            case R.id.mnuEdit:
-                editImage();
-                break;
             case R.id.mnuInfo:
                 infoImage();
                 break;
-            case R.id.mnuEdit2:
-                editImage2();
-                break;
-//            case R.id.mnuDel:
-//                delImage();
-//                break;
+
 //            case R.id.mnuRename:
 //                //renameImage();
 //                break;
-            case R.id.mnuLike:
-                addToFavoriteAlbum();
-                break;
             case R.id.mnuAddToAlbum:
                 addToAlbum();
                 break;
@@ -298,9 +343,25 @@ public class FullscreenPhotoActivity extends AppCompatActivity {
             @Override
             public void run() {
                 binding.viewPager.setCurrentItem(pos);
+                setFavCurrent();
             }
         });
     }
+
+    private void setFavCurrent(){
+        int id_album = 1;//id_album yeu thisch = 1
+        int id_photo = AlbumRoute.findIdByNamePhotos(getCurrentPhoto().getFilename());
+        boolean isPhotoInAlbum = AlbumRoute.isPhotoInAlbum(id_photo,id_album);
+        System.out.println(getCurrentPhoto().getFilename());
+        System.out.println(isPhotoInAlbum);
+        if(isPhotoInAlbum){
+            bottomNavigationView.getMenu().findItem(R.id.mnuLike).setIcon(R.drawable.ic_baseline_favorite_24);
+        }
+        else{
+            bottomNavigationView.getMenu().findItem(R.id.mnuLike).setIcon(R.drawable.ic_baseline_favorite_border_24);
+        }
+    }
+
     public static int deleteFileFromMediaStore(final ContentResolver contentResolver, final File file) {
         String canonicalPath;
         try {

@@ -12,17 +12,8 @@
         android:id="@+id/mnuCopy"
         android:title="@string/mnuCopy" />
     <item
-        android:id="@+id/mnuEdit"
-        android:title="@string/mnuEdit" />
-    <item
         android:id="@+id/mnuInfo"
         android:title="Get Info" />
-    <item
-        android:id="@+id/mnuEdit2"
-        android:title="Edit 2" />
-    <item
-        android:id="@+id/mnuLike"
-        android:title="@string/mnuLike" />
     <item
         android:id="@+id/mnuAddToAlbum"
         android:title="@string/mnuAddToAlbum" />

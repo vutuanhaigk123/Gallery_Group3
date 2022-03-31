@@ -31,11 +31,13 @@ public class PhotoFullscreenViewHolder extends ViewHolder{
             @Override
             public void onClick(View v) {
                 if(isClicked[0] == false){
+                    FullscreenPhotoActivity.bottomNavigationView.setVisibility(View.GONE);
                     hideNavBar();
                     FullscreenPhotoActivity.actionBar.hide();
                     isClicked[0] = true;
                 }
                 else{
+                    FullscreenPhotoActivity.bottomNavigationView.setVisibility(View.VISIBLE);
                     showNavBar();
                     FullscreenPhotoActivity.actionBar.show();
                     isClicked[0] = false;
@@ -46,7 +48,6 @@ public class PhotoFullscreenViewHolder extends ViewHolder{
     public void hideNavBar(){
         View decorView = ((Activity) itemView.getContext()).getWindow().getDecorView();
         int uiOptions = View.SYSTEM_UI_FLAG_LAYOUT_STABLE
-                | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
                 | View.SYSTEM_UI_FLAG_FULLSCREEN
                 | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
                 | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY;
@@ -55,7 +56,6 @@ public class PhotoFullscreenViewHolder extends ViewHolder{
     public void showNavBar(){
         View decorView = ((Activity) itemView.getContext()).getWindow().getDecorView();
         int uiOptions = View.SYSTEM_UI_FLAG_LAYOUT_STABLE
-                | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
                 | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
                 | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY;
         decorView.setSystemUiVisibility(uiOptions);

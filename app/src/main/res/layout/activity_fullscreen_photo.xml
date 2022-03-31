@@ -16,5 +16,14 @@
 
 
     </androidx.viewpager2.widget.ViewPager2>
-
+    <com.google.android.material.bottomnavigation.BottomNavigationView
+        android:id="@+id/bottomNavigationViewFullScreen"
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:menu="@menu/bottom_nav_menu"
+        app:labelVisibilityMode="unlabeled"
+        android:background="@drawable/transparent_rect"/>
 </androidx.constraintlayout.widget.ConstraintLayout>
