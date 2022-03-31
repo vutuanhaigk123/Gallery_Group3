@@ -9,7 +9,9 @@ import com.example.model.photos.Photo;
 import com.example.model.photos.PhotoList;
 import com.example.view.MainActivity;
 
+import java.io.File;
 import java.util.ArrayList;
+import java.util.Collections;
 
 public class AlbumRoute {
     public static int findIdByNamePhotos(String name){
@@ -47,6 +49,14 @@ public class AlbumRoute {
         }
         cursor.close();
         return  id;
+    }
+    public static int getNumberOfPhotoInAlbum(int id_album){
+        int result = 0;
+        Cursor cursor = MainActivity.database.
+
+                rawQuery("select * from album_photo where id_album = ?", new String[]{String.valueOf(id_album)});
+        result = cursor.getCount();
+        return result;
     }
     public static Photo getPhotoByIdAndAddIndex(int id_photo,int id_album){
         Photo photo;
@@ -97,14 +107,34 @@ public class AlbumRoute {
     public static PhotoList getPhotoListByAlbum(int id){
         ObservableArrayList<Photo> listIdPhoto = new ObservableArrayList<>();
         Cursor cursor = MainActivity.database.rawQuery("select  * from album_photo", null);
-        int index = 0;
-        while(cursor.moveToNext()){
-            int idAlbum = cursor.getInt(0);
-            int idPhoto = cursor.getInt(1);
-            if(idAlbum == id){
-                listIdPhoto.add(getPhotoByIdAndAddIndex(idPhoto, index++));
-
+//        int index = 0;
+//        while(cursor.moveToNext()){
+//            int idAlbum = cursor.getInt(0);
+//            int idPhoto = cursor.getInt(1);
+//            if(idAlbum == id){
+//                listIdPhoto.add(getPhotoByIdAndAddIndex(idPhoto, index++));
+//            }
+//        }
+        if(id==3){
+            int index = 0;
+            while(cursor.moveToNext()){
+                int idAlbum = cursor.getInt(0);
+                int idPhoto = cursor.getInt(1);
+                if(idAlbum == id){
+                    listIdPhoto.add(getPhotoByIdAndAddIndex(idPhoto, index++));
+                }
             }
+        }
+        else{
+            int index = getNumberOfPhotoInAlbum(id) - 1;
+            while(cursor.moveToNext()){
+                int idAlbum = cursor.getInt(0);
+                int idPhoto = cursor.getInt(1);
+                if(idAlbum == id){
+                    listIdPhoto.add(getPhotoByIdAndAddIndex(idPhoto, index--));
+                }
+            }
+            Collections.reverse(listIdPhoto);
         }
         cursor.close();
         return  new PhotoList(listIdPhoto);
@@ -121,17 +151,9 @@ public class AlbumRoute {
         cv.put("path",photo.getPath());
         cv.put("mimeType",photo.getMimeType());
         cv.put("filename",photo.getFilename());
-        cv.put("dateAdded",photo.getDateAdded());
+        cv.put("dateAdded",photo.getMilliseconds());
         cv.put("pwd", (String) null);
         MainActivity.database.insert("photos",null,cv);
-    }
-    public static int getNumberOfPhotoInAlbum(int id_album){
-        int result = 0;
-        Cursor cursor = MainActivity.database.
-
-                rawQuery("select * from album_photo where id_album = ?", new String[]{String.valueOf(id_album)});
-        result = cursor.getCount();
-        return result;
     }
     public static boolean isPhotoInAlbum(int id_photo, int id_album){
         Cursor c = MainActivity.database.rawQuery("SELECT * FROM album_photo", null);

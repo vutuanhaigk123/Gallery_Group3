@@ -111,9 +111,6 @@ public class AlbumsFragment extends Fragment {
                 0, R.layout.layout_album_thumbnail);
         binding.rvAlbums.setLayoutManager(new GridLayoutManager(container.getContext(),3));
         binding.rvAlbums.setAdapter(adapter);
-//        binding.recyclerView.addItemDecoration(
-//                new DividerItemDecoration(container.getContext(),
-//                        DividerItemDecoration.VERTICAL));
 
 
         return binding.getRoot();
@@ -127,7 +124,6 @@ public class AlbumsFragment extends Fragment {
             albums.add(cursor.getString(1) );
             id += cursor.getInt(0) + " ";
         }
-        System.out.println(id);
         cursor.close();
         return albums;
     }

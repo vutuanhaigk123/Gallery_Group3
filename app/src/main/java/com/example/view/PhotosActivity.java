@@ -12,6 +12,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.model.albums.AlbumRoute;
 import com.example.model.photos.PhotoAdapter;
 import com.example.model.photos.PhotoList;
 import com.example.model.photos.PhotoSortByDateAdapter;
@@ -46,7 +47,6 @@ public class PhotosActivity extends AppCompatActivity {
                 photoList.getPhotoList(),
                 PhotoAdapter.THUMBNAIL_MODE, currentLayout);
         Collections.reverse(PhotoSortByDateAdapter.ogPhotoList.getPhotoList());
-
         this.binding.recyclerPhotosView.setAdapter(photoSortByAdapter);
         //this.binding.tvNameOfAlbum.setText(nameOfAlbum);
         ActionBar actionBar = getSupportActionBar();
