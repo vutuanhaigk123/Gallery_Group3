@@ -1,10 +1,22 @@
 package com.example.view;
 
+import android.app.AlertDialog;
+import android.app.DatePickerDialog;
+import android.app.Dialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.InputType;
+import android.text.method.PasswordTransformationMethod;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.View;
+import android.view.Window;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
@@ -17,8 +29,11 @@ import com.example.model.photos.PhotoAdapter;
 import com.example.model.photos.PhotoList;
 import com.example.model.photos.PhotoSortByDateAdapter;
 import com.example.view.databinding.ActivityPhotosBinding;
+import com.example.view.databinding.LayoutSetPasswordBinding;
 
 import java.util.Collections;
+
+import at.favre.lib.crypto.bcrypt.BCrypt;
 
 public class PhotosActivity extends AppCompatActivity {
 
@@ -29,6 +44,9 @@ public class PhotosActivity extends AppCompatActivity {
     public static final int LAYOUT_SORT_BY_MONTH = 1;
     public static final int LAYOUT_SORT_BY_YEAR = 2;
     private int currentLayout;
+
+    private boolean isAlbum = false;
+    private String nameOfAlbum;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -37,7 +55,8 @@ public class PhotosActivity extends AppCompatActivity {
         setContentView(binding.getRoot());
         Intent intent = getIntent();
         photoList = (PhotoList)  intent.getSerializableExtra("photoListOfAlbum");
-        String nameOfAlbum = intent.getStringExtra("nameOfAlbum");
+        nameOfAlbum = intent.getStringExtra("nameOfAlbum");
+        isAlbum = intent.getBooleanExtra("isAlbum", false);
         this.binding.recyclerPhotosView.setLayoutManager( new LinearLayoutManager(
                 this,
                 RecyclerView.VERTICAL,false));
@@ -56,7 +75,11 @@ public class PhotosActivity extends AppCompatActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = new MenuInflater(this);
-        inflater.inflate(R.menu.option_menu_photos,menu);
+        if(isAlbum) {
+            inflater.inflate(R.menu.option_menu_album_in_layout,menu);
+        }
+        else
+            inflater.inflate(R.menu.option_menu_photos,menu);
         return super.onCreateOptionsMenu(menu);
     }
 
@@ -73,6 +96,8 @@ public class PhotosActivity extends AppCompatActivity {
             case R.id.photosmnu_sortByYear:
                 layout = PhotosFragment.LAYOUT_SORT_BY_YEAR;
                 break;
+            case R.id.album_set_password:
+                setPassword();
         }
 
         if(layout != -1 && layout != currentLayout){
@@ -86,5 +111,32 @@ public class PhotosActivity extends AppCompatActivity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    private void setPassword() {
+        final AlertDialog.Builder builder = new AlertDialog.Builder(binding.getRoot().getContext());
+        builder.setTitle("Create Password");
+        LayoutSetPasswordBinding layoutSetPasswordBinding = LayoutSetPasswordBinding.inflate(getLayoutInflater());
+        EditText confirmPassword = layoutSetPasswordBinding.confirmPasswordAlbum;
+        EditText password = layoutSetPasswordBinding.passwordAlbum;
+        builder.setView(layoutSetPasswordBinding.getRoot());
+        builder.setPositiveButton("Create", new DialogInterface.OnClickListener() {
+
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                if( password.getText().toString().equals(confirmPassword.getText().toString())) {
+                    String bcryptHashString = BCrypt.withDefaults().hashToString(12, password.getText().toString().toCharArray());
+                    AlbumRoute.addPasswordOfAlbum(AlbumRoute.findIdByNameAlbum(nameOfAlbum), bcryptHashString);
+                    Toast.makeText(binding.getRoot().getContext(), "Password created success", Toast.LENGTH_SHORT).show();
+
+                    System.out.println(bcryptHashString);
+                    String s = AlbumRoute.getPassword(AlbumRoute.findIdByNameAlbum(nameOfAlbum));
+                    System.out.println(s);
+                }
+                else
+                    Toast.makeText(binding.getRoot().getContext(), "Password does not match the confirm password", Toast.LENGTH_SHORT).show();
+            }
+        });
+        builder.show();
     }
 }

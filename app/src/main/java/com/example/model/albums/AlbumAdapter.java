@@ -1,10 +1,16 @@
 package com.example.model.albums;
 
 import android.app.ActionBar;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.view.LayoutInflater;
+import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -12,8 +18,14 @@ import androidx.databinding.ObservableArrayList;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.model.photos.Photo;
+import com.example.model.photos.PhotoList;
 import com.example.model.photos.ViewHolder;
+import com.example.view.PhotosActivity;
 import com.example.view.databinding.LayoutAlbumThumbnailBinding;
+import com.example.view.databinding.LayoutEnterPasswordBinding;
+import com.example.view.databinding.LayoutSetPasswordBinding;
+
+import at.favre.lib.crypto.bcrypt.BCrypt;
 
 public class AlbumAdapter extends  RecyclerView.Adapter<ViewHolder> {
     public static AlbumList albumList;
@@ -54,6 +66,35 @@ public class AlbumAdapter extends  RecyclerView.Adapter<ViewHolder> {
         LayoutAlbumThumbnailBinding photoRowBinding = (LayoutAlbumThumbnailBinding) LayoutAlbumThumbnailBinding.inflate(
                 layoutInflater, parent, false
         );
+        photoRowBinding.cardView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if(AlbumRoute.getPassword(photoRowBinding.getPhoto().getIndex()) != null) {
+                    final AlertDialog.Builder builder = new AlertDialog.Builder(photoRowBinding.getRoot().getContext());
+                    builder.setTitle("Password");
+                    LayoutEnterPasswordBinding layoutEnterPasswordBinding = LayoutEnterPasswordBinding.inflate(layoutInflater);
+                    EditText password = layoutEnterPasswordBinding.passwordAlbum;
+                    builder.setView(layoutEnterPasswordBinding.getRoot());
+                    builder.setPositiveButton("Confirm", new DialogInterface.OnClickListener() {
+
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {
+                            BCrypt.Result result = BCrypt.verifyer().verify(password.getText().toString().toCharArray(), AlbumRoute.getPassword(photoRowBinding.getPhoto().getIndex()));
+                            if( result.verified) {
+                                //switch to screen photo
+                                switchToScreenPhoto(photoRowBinding);
+                            }
+                            else
+                                Toast.makeText(photoRowBinding.getRoot().getContext(), "Wrong Password", Toast.LENGTH_SHORT).show();
+                        }
+                    });
+                    builder.show();
+                }
+                else {
+                    switchToScreenPhoto(photoRowBinding);
+                }
+            }
+        });
         return new com.example.model.albums.AlbumViewHolder(photoRowBinding, albumList);
     }
 
@@ -82,6 +123,18 @@ public class AlbumAdapter extends  RecyclerView.Adapter<ViewHolder> {
     @Override
     public int getItemCount() {
         return albumList.size();
+    }
+
+    private void switchToScreenPhoto(LayoutAlbumThumbnailBinding albumThumbnailBinding){
+        Intent intent = new Intent(albumThumbnailBinding.getRoot().getContext(), PhotosActivity.class);
+        int pos = albumThumbnailBinding.getPhoto().getIndex()-1;
+        PhotoList photoList = AlbumRoute.getPhotoListByAlbum(albumList.get(pos).getId());
+
+        intent.putExtra("photoListOfAlbum",photoList);
+        intent.putExtra("nameOfAlbum",albumList.get(pos).getName());
+        intent.putExtra("isAlbum",true);
+        albumThumbnailBinding.getRoot().getContext().startActivity(intent);
+
     }
 
 }

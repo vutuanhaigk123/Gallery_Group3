@@ -171,4 +171,19 @@ public class AlbumRoute {
         c.close();
         return false;
     }
+
+    public static void addPasswordOfAlbum(int id_album, String hashPassword){
+        ContentValues updValues = new ContentValues();
+        updValues.put("pwd", hashPassword);
+
+        int recAffected = MainActivity.database.update( "albums", updValues,
+                "id = ?", new String[]{String.valueOf(id_album)} );
+
+    }
+
+    public static String getPassword(int id_album) {
+        Cursor cursor = MainActivity.database.rawQuery("Select pwd from albums where id = ?", new String[]{String.valueOf(id_album)});
+        cursor.moveToFirst();
+        return cursor.getString(0);
+    }
 }

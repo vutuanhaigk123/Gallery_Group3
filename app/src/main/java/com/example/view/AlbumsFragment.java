@@ -94,6 +94,7 @@ public class AlbumsFragment extends Fragment {
             case R.id.mnuAddAlbums:
                 addAlbum();
                 break;
+
         }
         return super.onOptionsItemSelected(item);
     }

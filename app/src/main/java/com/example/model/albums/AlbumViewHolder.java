@@ -18,18 +18,20 @@ public class AlbumViewHolder extends ViewHolder {
         super(albumRowBinding.getRoot());
         this.albumList = albumList;
         this.albumRowBinding = albumRowBinding;
-        albumRowBinding.imgAvtAlbum.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                switchToScreenPhoto();
-            }
-        });
+//        albumRowBinding.imgAvtAlbum.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                if(AlbumRoute.getPassword(albumRowBinding.getPhoto().getIndex()) == null)
+//                    switchToScreenPhoto();
+//            }
+//        });
     }
 
     @Override
     public ViewDataBinding getBinding() {
         return albumRowBinding;
     }
+
     private void switchToScreenPhoto(){
         Intent intent = new Intent(albumRowBinding.getRoot().getContext(), PhotosActivity.class);
         int pos = albumRowBinding.getPhoto().getIndex()-1;
@@ -37,6 +39,7 @@ public class AlbumViewHolder extends ViewHolder {
 
         intent.putExtra("photoListOfAlbum",photoList);
         intent.putExtra("nameOfAlbum",albumList.get(pos).getName());
+        intent.putExtra("isAlbum",true);
         albumRowBinding.getRoot().getContext().startActivity(intent);
 
     }
