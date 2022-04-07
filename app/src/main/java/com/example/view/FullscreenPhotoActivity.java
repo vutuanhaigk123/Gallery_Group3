@@ -4,11 +4,9 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.ActivityCompat;
 import androidx.databinding.ObservableArrayList;
 import androidx.viewpager2.widget.ViewPager2;
 
-import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -18,10 +16,8 @@ import android.content.ContentResolver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.util.Log;
@@ -55,11 +51,10 @@ import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
-import java.util.Collections;
 import java.util.Date;
-import java.util.Locale;
 import java.util.UUID;
 
+@SuppressWarnings("ALL")
 public class FullscreenPhotoActivity extends AppCompatActivity {
 
     private ActivityFullscreenPhotoBinding binding;
@@ -96,6 +91,7 @@ public class FullscreenPhotoActivity extends AppCompatActivity {
             actionBar.setDisplayHomeAsUpEnabled(true);
         }
         bottomNavigationView.setOnItemSelectedListener(new NavigationBarView.OnItemSelectedListener() {
+            @SuppressLint("NonConstantResourceId")
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
                 switch (item.getItemId()){
@@ -122,7 +118,7 @@ public class FullscreenPhotoActivity extends AppCompatActivity {
                         editImage2();
                         break;
                     case R.id.mnuDeleteImg:
-//                        delImage();
+                        delImage();
                         break;
                 }
                 return true;
@@ -281,6 +277,7 @@ public class FullscreenPhotoActivity extends AppCompatActivity {
         }
     }
 
+    @SuppressLint("NotifyDataSetChanged")
     private void checkImageAfterCrop(int resultCode, @Nullable Intent data){
         if(resultCode == RESULT_OK && data != null){
             Uri resultUri = UCrop.getOutput(data);
@@ -291,6 +288,7 @@ public class FullscreenPhotoActivity extends AppCompatActivity {
             }
             // lấy ngày hiện tại để lưu ảnh
             Date date = new Date();
+            @SuppressLint("SimpleDateFormat")
             SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
             String strDate = formatter.format(date);
 
@@ -392,7 +390,23 @@ public class FullscreenPhotoActivity extends AppCompatActivity {
                 Photo current = getCurrentPhoto();
                 String path = current.getPath();
                 File file = new File(path);
-                Toast.makeText(FullscreenPhotoActivity.this, deleteFileFromMediaStore(getContentResolver(), file) + "", Toast.LENGTH_SHORT).show();
+                int deletedPhotos = deleteFileFromMediaStore(getContentResolver(), file);
+                if( deletedPhotos > 0){
+                    Toast.makeText(FullscreenPhotoActivity.this,
+                            "Xoá thành công " + deletedPhotos + " ảnh",
+                            Toast.LENGTH_SHORT).show();
+                }
+                else {
+                    Toast.makeText(FullscreenPhotoActivity.this,
+                            "Xoá ảnh thất bại. Xảy ra lỗi khi xoá ảnh",
+                            Toast.LENGTH_SHORT).show();
+                }
+//                Toast.makeText(FullscreenPhotoActivity.this,
+//                        deleteFileFromMediaStore(getContentResolver(), file) + "",
+//                        Toast.LENGTH_SHORT).show();
+//                boolean b = file.delete();
+//                Toast.makeText(FullscreenPhotoActivity.this, b + "",
+//                        Toast.LENGTH_SHORT).show();
 
 //                File file = new File(path);
 //                Toast.makeText(FullscreenPhotoActivity.this, file.getPath(), Toast.LENGTH_SHORT).show();
@@ -424,7 +438,7 @@ public class FullscreenPhotoActivity extends AppCompatActivity {
         }
         else{
             boolean isPhotoInAlbum = AlbumRoute.isPhotoInAlbum(id_photo,id_album);
-            if(isPhotoInAlbum == true){
+            if(isPhotoInAlbum){
                 Toast.makeText(FullscreenPhotoActivity.this, "Đã tồn tại", Toast.LENGTH_SHORT).show();
             }
             else {

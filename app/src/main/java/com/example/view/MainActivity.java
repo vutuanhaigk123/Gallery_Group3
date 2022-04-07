@@ -12,6 +12,7 @@ import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.content.pm.PackageManager;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
@@ -19,7 +20,6 @@ import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
-import android.view.WindowManager;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
@@ -33,6 +33,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
+@SuppressWarnings({"Convert2Lambda", "FieldCanBeLocal"})
 public class MainActivity extends AppCompatActivity {
     private ProgressBar pgBar;
     private ActivityMainBinding binding;
@@ -40,8 +41,8 @@ public class MainActivity extends AppCompatActivity {
     private PhotosFragment photosFragment;
     private SearchFragment searchFragment;
     private int currentButton;
-    private String DB_NAME = "DBGallery.db";
-    private String DB_PATH = "/databases/";// lưu trữ trong thư mục cài đặt gốc
+    private final String DB_NAME = "DBGallery.db";
+    private final String DB_PATH = "/databases/";// lưu trữ trong thư mục cài đặt gốc
     public  static SQLiteDatabase database = null;
     public static BottomNavigationView bottomNavigationView;
 
@@ -51,7 +52,6 @@ public class MainActivity extends AppCompatActivity {
         //lần đầu thì copy
         copyDatabaseFromAssets();
         database = openOrCreateDatabase(DB_NAME, MODE_PRIVATE, null);
-        makeFullScreen(getWindow());
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         bottomNavigationView = binding.bottomNavigationView2;
         setContentView(binding.getRoot());
@@ -65,6 +65,7 @@ public class MainActivity extends AppCompatActivity {
     private void addEvents() {
         binding.bottomNavigationView2.setOnItemSelectedListener(
                 new NavigationBarView.OnItemSelectedListener() {
+                    @SuppressLint("NonConstantResourceId")
                     @Override
                     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
                         int id = item.getItemId();
@@ -113,7 +114,10 @@ public class MainActivity extends AppCompatActivity {
         if(checkReadPermission() != PackageManager.PERMISSION_GRANTED){
             ActivityCompat.requestPermissions(
                     MainActivity.this,
-                    new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, READ_EXTERNAL_STORAGE_CODE);
+                    new String[]{Manifest.permission.READ_EXTERNAL_STORAGE,
+                            Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                            Manifest.permission.SET_WALLPAPER},
+                    READ_EXTERNAL_STORAGE_CODE);
         } else {
             getAlbum();
         }
@@ -139,10 +143,11 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public static void makeFullScreen(Window window) {
-//        window.requestFeature(Window.FEATURE_NO_TITLE);
-//        window.setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
-//                WindowManager.LayoutParams.FLAG_FULLSCREEN);
+        // window.requestFeature(Window.FEATURE_NO_TITLE);
+        // window.setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
+        //         WindowManager.LayoutParams.FLAG_FULLSCREEN);
     }
+    @SuppressWarnings("ResultOfMethodCallIgnored")
     private void copyDatabase(){
         try {
             InputStream inputStream = getAssets().open(DB_NAME);
@@ -158,7 +163,7 @@ public class MainActivity extends AppCompatActivity {
             int len;
             while((len = inputStream.read(buffer)) > 0){
                 outputStream.write(buffer,0,len);
-            };
+            }
             outputStream.flush();
             inputStream.close();
             outputStream.close();

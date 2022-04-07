@@ -14,38 +14,69 @@ import java.util.ArrayList;
 import java.util.Collections;
 
 public class AlbumRoute {
+    public static int ID_ALBUM_FAVORITE = 1;
+    public static int ID_ALBUM_DELETED = 2;
+    public static int ID_ALBUM_SCREENSHOT = 3;
+
     public static int findIdByNamePhotos(String name){
-        ArrayList<String> albums = new ArrayList<>();
+        String[] selections = {"id"};
+        String whereCondition = "filename = ?";
+        String[] whereConditionArgs = {name};
         Cursor cursor = MainActivity.database.query("photos",
-                null,null,null,null,null,null);
-        while(cursor.moveToNext()){
-            if(name.equals(cursor.getString(2)))
-            return cursor.getInt(0);
+                selections, whereCondition, whereConditionArgs,
+                null,null,null);
+        int id = -1;
+        if(cursor.moveToNext()){
+            id = cursor.getInt(0);
         }
         cursor.close();
-        return -1;
+        return id;
     }
+
+    public static int findIdByPhotoPath(String path){
+        String[] selections = {"id"};
+        String whereCondition = "path = ?";
+        String[] whereConditionArgs = {path};
+        Cursor cursor = MainActivity.database.query("photos",
+                selections, whereCondition, whereConditionArgs,
+                null,null,null);
+        int id = -1;
+        if(cursor.moveToNext()){
+            id = cursor.getInt(0);
+        }
+        cursor.close();
+        return id;
+    }
+
     public static int findIdByNameAlbum(String name){
+        String[] selections = {"id"};
+        String whereCondition = "name = ?";
+        String[] whereConditionArgs = {name};
         ArrayList<String> albums = new ArrayList<>();
         Cursor cursor = MainActivity.database.query("albums",
-                null,null,null,null,null,null);
-        while(cursor.moveToNext()){
-            if(name.equals(cursor.getString(1)))
-                return cursor.getInt(0);
+                selections, whereCondition, whereConditionArgs,
+                null,null,null);
+        int id = -1;
+        if(cursor.moveToNext()){
+            id = cursor.getInt(0);
         }
         cursor.close();
-        return -1;
+        return id;
     }
     public static int getFirstPhotoInAlbum(int id_album){
 
-        Cursor cursor = MainActivity.database.rawQuery("select  * from album_photo", null);
+        Cursor cursor = MainActivity.database
+                .rawQuery("select  * from album_photo " +
+                        "where id_album = " + id_album, null);
         int id = -1;
-        while(cursor.moveToNext()){
-            int idAlbum = cursor.getInt(0);
-            int idPhoto = cursor.getInt(1);
-            if(idAlbum == id_album){
-                id = idPhoto;
-            }
+        if(cursor.moveToNext()){
+            cursor.moveToLast();
+            id = cursor.getInt(1);
+//            int idAlbum = cursor.getInt(0);
+//            int idPhoto = cursor.getInt(1);
+//            if(idAlbum == id_album){
+//                id = idPhoto;
+//            }
         }
         cursor.close();
         return  id;
@@ -54,15 +85,16 @@ public class AlbumRoute {
         int result = 0;
         Cursor cursor = MainActivity.database.
 
-                rawQuery("select * from album_photo where id_album = ?", new String[]{String.valueOf(id_album)});
+                rawQuery("select * from album_photo where id_album = ?",
+                        new String[]{String.valueOf(id_album)});
         result = cursor.getCount();
         return result;
     }
     public static Photo getPhotoByIdAndAddIndex(int id_photo,int id_album){
         Photo photo;
         Cursor cursor = MainActivity.database.
-
-                rawQuery("select * from photos where id = ?", new String[]{String.valueOf(id_photo)});
+                rawQuery("select * from photos where id = ?",
+                        new String[] {String.valueOf(id_photo)});
         cursor.moveToNext();
         String path = cursor.getString(1);
         String filename = cursor.getString(2);
@@ -75,8 +107,8 @@ public class AlbumRoute {
     public static Photo getPhotoById(int id_photo){
         Photo photo;
         Cursor cursor = MainActivity.database.
-
-                rawQuery("select * from photos where id = ?", new String[]{String.valueOf(id_photo)});
+                rawQuery("select * from photos where id = ?",
+                        new String[] {String.valueOf(id_photo)});
         while(cursor.moveToNext()){
             String path = cursor.getString(1);
             String filename = cursor.getString(2);
@@ -156,17 +188,24 @@ public class AlbumRoute {
         MainActivity.database.insert("photos",null,cv);
     }
     public static boolean isPhotoInAlbum(int id_photo, int id_album){
-        Cursor c = MainActivity.database.rawQuery("SELECT * FROM album_photo", null);
+        Cursor c = MainActivity.database.rawQuery(
+                "SELECT count(*) FROM album_photo " +
+                        "where id_photo = " + id_photo + " and id_album = " + id_album,
+                null);
 
         if(c.moveToFirst()){
-            do{
-                int idAlbum = c.getInt(0);
-                int idPhoto = c.getInt(1);
-                if(idAlbum == id_album && idPhoto == id_photo){
-                    return true;
-                }
-
-            }while(c.moveToNext());
+            if(c.getInt(0) != 0){
+                c.close();
+                return true;
+            }
+//            do{
+//                int idAlbum = c.getInt(0);
+//                int idPhoto = c.getInt(1);
+//                if(idAlbum == id_album && idPhoto == id_photo){
+//                    return true;
+//                }
+//
+//            }while(c.moveToNext());
         }
         c.close();
         return false;
@@ -182,7 +221,9 @@ public class AlbumRoute {
     }
 
     public static String getPassword(int id_album) {
-        Cursor cursor = MainActivity.database.rawQuery("Select pwd from albums where id = ?", new String[]{String.valueOf(id_album)});
+        Cursor cursor = MainActivity.database
+                .rawQuery("Select pwd from albums where id = ?",
+                        new String[]{String.valueOf(id_album)});
         cursor.moveToFirst();
         return cursor.getString(0);
     }

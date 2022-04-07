@@ -43,6 +43,13 @@ public class PhotoList implements Serializable {
                 if(cursor.getString(1) == null){
                     continue;
                 }
+                else {
+                    int id_photo = AlbumRoute.findIdByPhotoPath(cursor.getString(3));
+                    if(AlbumRoute.isPhotoInAlbum(id_photo,
+                            AlbumRoute.ID_ALBUM_DELETED)){
+                        continue;
+                    }
+                }
                 photoList.add(new Photo(cursor.getString(3),
                         cursor.getString(1),
                         cursor.getString(2),
