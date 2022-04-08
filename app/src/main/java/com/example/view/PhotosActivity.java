@@ -1,5 +1,6 @@
 package com.example.view;
 
+import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.app.Dialog;
@@ -47,6 +48,7 @@ public class PhotosActivity extends AppCompatActivity {
 
     private boolean isAlbum = false;
     private String nameOfAlbum;
+    @SuppressLint("RestrictedApi")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -57,6 +59,9 @@ public class PhotosActivity extends AppCompatActivity {
         photoList = (PhotoList)  intent.getSerializableExtra("photoListOfAlbum");
         nameOfAlbum = intent.getStringExtra("nameOfAlbum");
         isAlbum = intent.getBooleanExtra("isAlbum", false);
+        if(photoList.getPhotoList().size() == 0){
+            binding.noPhotos.setVisibility(View.VISIBLE);
+        }
         this.binding.recyclerPhotosView.setLayoutManager( new LinearLayoutManager(
                 this,
                 RecyclerView.VERTICAL,false));
@@ -69,9 +74,11 @@ public class PhotosActivity extends AppCompatActivity {
         this.binding.recyclerPhotosView.setAdapter(photoSortByAdapter);
         //this.binding.tvNameOfAlbum.setText(nameOfAlbum);
         ActionBar actionBar = getSupportActionBar();
-        actionBar.setTitle(nameOfAlbum);
+        if(actionBar != null){
+            actionBar.setDisplayHomeAsUpEnabled(true);
+            actionBar.setTitle(nameOfAlbum);
+        }
     }
-
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = new MenuInflater(this);
@@ -87,6 +94,9 @@ public class PhotosActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         int layout = -1;
         switch (item.getItemId()){
+            case android.R.id.home:
+                finish();
+                return true;
             case R.id.photosmnu_sortByDate:
                 layout = PhotosFragment.LAYOUT_SORT_BY_DATE;
                 break;

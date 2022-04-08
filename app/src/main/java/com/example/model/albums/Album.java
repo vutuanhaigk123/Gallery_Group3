@@ -5,12 +5,21 @@ public class Album {
     private String name;
     private String pwd;
     private int index;
+    private boolean isClicked = false;
 
     public Album(int id, String name, String pwd, int index) {
         this.id = id;
         this.name = name;
         this.pwd = pwd;
         this.index = index;
+    }
+
+    public boolean isClicked() {
+        return isClicked;
+    }
+
+    public void setClicked(boolean clicked) {
+        isClicked = clicked;
     }
 
     public int getIndex() {

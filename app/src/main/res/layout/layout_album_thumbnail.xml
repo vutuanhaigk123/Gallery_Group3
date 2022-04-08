@@ -36,6 +36,22 @@
                 android:contentDescription="@string/btnPhotos"
                 android:loadThumb="@{photo.path}"
                 android:src="@drawable/empty_album"/>
+            <ImageView
+                android:id="@+id/icCheck"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/ic_check"
+                android:visibility="gone"
+                android:layout_gravity="center"
+                ></ImageView>
+            <ImageView
+                android:id="@+id/icUnCheck"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/ic_baseline_radio_button_unchecked_24"
+                android:visibility="gone"
+                android:layout_gravity="center"
+                ></ImageView>
         </androidx.cardview.widget.CardView>
 
         <TextView

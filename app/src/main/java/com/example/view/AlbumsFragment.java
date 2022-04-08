@@ -7,6 +7,7 @@ import android.database.Cursor;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
+import androidx.databinding.ObservableArrayList;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -22,6 +23,7 @@ import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.example.model.albums.Album;
 import com.example.model.albums.AlbumAdapter;
 import com.example.model.albums.AlbumList;
 import com.example.model.photos.PhotoList;
@@ -40,10 +42,13 @@ public class AlbumsFragment extends Fragment {
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
-    private FragmentAlbumsBinding binding;
+    public static FragmentAlbumsBinding binding;
     private PhotoList screenshotsAlbum;
     private AlbumList albumList;
     private AlbumAdapter adapter;
+    public static boolean isEnable = false;
+    public static boolean isSelectAll = false;
+    public static ObservableArrayList<Album> selectedList = new ObservableArrayList<>();
     // TODO: Rename and change types of parameters
     private String mParam1;
     private String mParam2;
