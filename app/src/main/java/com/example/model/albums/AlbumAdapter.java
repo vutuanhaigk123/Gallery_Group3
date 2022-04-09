@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
+import android.os.Parcelable;
 import android.view.ActionMode;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -35,6 +36,8 @@ import com.example.view.R;
 import com.example.view.databinding.LayoutAlbumThumbnailBinding;
 import com.example.view.databinding.LayoutEnterPasswordBinding;
 import com.example.view.databinding.LayoutSetPasswordBinding;
+
+import java.util.ArrayList;
 
 import at.favre.lib.crypto.bcrypt.BCrypt;
 
@@ -77,35 +80,6 @@ public class AlbumAdapter extends  RecyclerView.Adapter<ViewHolder> {
         LayoutAlbumThumbnailBinding photoRowBinding = (LayoutAlbumThumbnailBinding) LayoutAlbumThumbnailBinding.inflate(
                 layoutInflater, parent, false
         );
-//        photoRowBinding.cardView.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View view) {
-//                if(AlbumRoute.getPassword(photoRowBinding.getPhoto().getIndex()) != null) {
-//                    final AlertDialog.Builder builder = new AlertDialog.Builder(photoRowBinding.getRoot().getContext());
-//                    builder.setTitle("Password");
-//                    LayoutEnterPasswordBinding layoutEnterPasswordBinding = LayoutEnterPasswordBinding.inflate(layoutInflater);
-//                    EditText password = layoutEnterPasswordBinding.passwordAlbum;
-//                    builder.setView(layoutEnterPasswordBinding.getRoot());
-//                    builder.setPositiveButton("Confirm", new DialogInterface.OnClickListener() {
-//
-//                        @Override
-//                        public void onClick(DialogInterface dialogInterface, int i) {
-//                            BCrypt.Result result = BCrypt.verifyer().verify(password.getText().toString().toCharArray(), AlbumRoute.getPassword(photoRowBinding.getPhoto().getIndex()));
-//                            if( result.verified) {
-//                                //switch to screen photo
-//                                switchToScreenPhoto(photoRowBinding);
-//                            }
-//                            else
-//                                Toast.makeText(photoRowBinding.getRoot().getContext(), "Wrong Password", Toast.LENGTH_SHORT).show();
-//                        }
-//                    });
-//                    builder.show();
-//                }
-//                else {
-//                    switchToScreenPhoto(photoRowBinding);
-//                }
-//            }
-//        });
         return new com.example.model.albums.AlbumViewHolder(photoRowBinding, albumList);
     }
 
@@ -163,12 +137,35 @@ public class AlbumAdapter extends  RecyclerView.Adapter<ViewHolder> {
                                 public boolean onActionItemClicked(ActionMode actionMode, MenuItem menuItem) {
                                     switch (menuItem.getItemId()){
                                         case R.id.acm_delete:
-//                                                for(Photo photo: PhotosFragment.selectedList){
-//                                                    photoList.getPhotoList().remove(photo);
-//                                                }
-//                                                if(photoList.getPhotoList().size() == 0){
-//                                                    // TO DO
-//                                                }
+                                            for(Album album1 : AlbumsFragment.selectedList) {
+                                                if(AlbumRoute.getPassword(AlbumRoute.findIdByNameAlbum(album1.getName())) != null) {
+                                                    final AlertDialog.Builder builder = new AlertDialog.Builder(binding.getRoot().getContext());
+                                                    builder.setTitle("Enter password of album: " + album1.getName());
+                                                    LayoutEnterPasswordBinding layoutEnterPasswordBinding = LayoutEnterPasswordBinding.inflate(LayoutInflater.from(binding.getRoot().getContext()));
+                                                    EditText password = layoutEnterPasswordBinding.passwordAlbum;
+                                                    builder.setView(layoutEnterPasswordBinding.getRoot());
+                                                    builder.setPositiveButton("Confirm", new DialogInterface.OnClickListener() {
+
+                                                        @Override
+                                                        public void onClick(DialogInterface dialogInterface, int i) {
+                                                            BCrypt.Result result = BCrypt.verifyer().verify(password.getText().toString().toCharArray(), AlbumRoute.getPassword(AlbumRoute.findIdByNameAlbum(album1.getName())));
+                                                            if( result.verified) {
+                                                                //switch to screen photo
+                                                                AlbumRoute.deleteAlbum(AlbumRoute.findIdByNameAlbum(album1.getName()));
+                                                                Toast.makeText(binding.getRoot().getContext(), "Xóa album "+ album1.getName() + " thành công", Toast.LENGTH_SHORT).show();
+                                                            }
+                                                            else
+                                                                Toast.makeText(binding.getRoot().getContext(), "Sai mật khẩu", Toast.LENGTH_SHORT).show();
+                                                        }
+                                                    });
+                                                    builder.show();
+                                                }
+                                                else
+                                                    AlbumRoute.deleteAlbum(AlbumRoute.findIdByNameAlbum(album1.getName()));
+                                            }
+
+                                            albumList = new AlbumList(AlbumList.readAlbumList());
+                                            setAlbumList(albumList);
                                             actionMode.finish();
                                             break;
                                         case R.id.acm_select_all:
@@ -385,6 +382,7 @@ public class AlbumAdapter extends  RecyclerView.Adapter<ViewHolder> {
         intent.putExtra("photoListOfAlbum",photoList);
         intent.putExtra("nameOfAlbum",albumList.get(pos).getName());
         intent.putExtra("isAlbum",true);
+
         albumThumbnailBinding.getRoot().getContext().startActivity(intent);
 
     }

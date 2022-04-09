@@ -45,7 +45,7 @@ public class AlbumsFragment extends Fragment {
     public static FragmentAlbumsBinding binding;
     private PhotoList screenshotsAlbum;
     private AlbumList albumList;
-    private AlbumAdapter adapter;
+    public static AlbumAdapter adapter;
     public static boolean isEnable = false;
     public static boolean isSelectAll = false;
     public static ObservableArrayList<Album> selectedList = new ObservableArrayList<>();
@@ -117,7 +117,6 @@ public class AlbumsFragment extends Fragment {
                 0, R.layout.layout_album_thumbnail);
         binding.rvAlbums.setLayoutManager(new GridLayoutManager(container.getContext(),3));
         binding.rvAlbums.setAdapter(adapter);
-
 
         return binding.getRoot();
     }

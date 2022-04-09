@@ -25,6 +25,8 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.model.albums.AlbumAdapter;
+import com.example.model.albums.AlbumList;
 import com.example.model.albums.AlbumRoute;
 import com.example.model.photos.PhotoAdapter;
 import com.example.model.photos.PhotoList;
@@ -139,6 +141,9 @@ public class PhotosActivity extends AppCompatActivity {
                     Toast.makeText(binding.getRoot().getContext(),
                             "Xoá thành công",
                             Toast.LENGTH_SHORT).show();
+                    AlbumAdapter.albumList = new AlbumList(AlbumList.readAlbumList());
+                    AlbumsFragment.adapter.setAlbumList(AlbumAdapter.albumList);
+                    finish();
                 }
                 else {
                     Toast.makeText(binding.getRoot().getContext(),

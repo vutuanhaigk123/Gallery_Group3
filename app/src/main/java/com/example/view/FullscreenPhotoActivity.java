@@ -395,6 +395,8 @@ public class FullscreenPhotoActivity extends AppCompatActivity {
                     Toast.makeText(FullscreenPhotoActivity.this,
                             "Xoá thành công " + deletedPhotos + " ảnh",
                             Toast.LENGTH_SHORT).show();
+                    photoList = new PhotoList(PhotoList.readMediaStore(binding.getRoot().getContext()));
+                    finish();
                 }
                 else {
                     Toast.makeText(FullscreenPhotoActivity.this,

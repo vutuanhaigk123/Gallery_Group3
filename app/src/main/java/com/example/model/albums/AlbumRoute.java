@@ -237,7 +237,7 @@ public class AlbumRoute {
 
         if(photoList.size() != 0) {
             int recAffected2 = MainActivity.database.delete("album_photo",
-                    "id = ?",
+                    "id_album = ?",
                     new String[]{String.valueOf(id_album)});
         }
         return recAffected;
