@@ -227,4 +227,19 @@ public class AlbumRoute {
         cursor.moveToFirst();
         return cursor.getString(0);
     }
+
+    public static int deleteAlbum(int id_album) {
+        int recAffected = MainActivity.database.delete("albums",
+                "id = ?",
+                new String[]{String.valueOf(id_album)});
+
+        PhotoList photoList = getPhotoListByAlbum(id_album);
+
+        if(photoList.size() != 0) {
+            int recAffected2 = MainActivity.database.delete("album_photo",
+                    "id = ?",
+                    new String[]{String.valueOf(id_album)});
+        }
+        return recAffected;
+    }
 }

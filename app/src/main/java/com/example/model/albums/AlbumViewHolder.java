@@ -19,19 +19,19 @@ public class AlbumViewHolder extends ViewHolder {
         super(albumRowBinding.getRoot());
         this.albumList = albumList;
         this.albumRowBinding = albumRowBinding;
-        albumRowBinding.imgAvtAlbum.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if(AlbumsFragment.isEnable){
-                    if(!AlbumAdapter.isSystemAlbum(albumRowBinding.getAlbum())){
-                        ClickItem(albumRowBinding);
-                    }
-                }
-                else{
-                    switchToScreenPhoto();
-                }
-            }
-        });
+//        albumRowBinding.imgAvtAlbum.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                if(AlbumsFragment.isEnable){
+//                    if(!AlbumAdapter.isSystemAlbum(albumRowBinding.getAlbum())){
+//                        ClickItem(albumRowBinding);
+//                    }
+//                }
+//                else{
+//                    switchToScreenPhoto();
+//                }
+//            }
+//        });
     }
 
     @Override

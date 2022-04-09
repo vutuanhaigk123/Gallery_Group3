@@ -13,6 +13,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewParent;
 import android.view.ViewTreeObserver;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -76,35 +77,35 @@ public class AlbumAdapter extends  RecyclerView.Adapter<ViewHolder> {
         LayoutAlbumThumbnailBinding photoRowBinding = (LayoutAlbumThumbnailBinding) LayoutAlbumThumbnailBinding.inflate(
                 layoutInflater, parent, false
         );
-        photoRowBinding.cardView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if(AlbumRoute.getPassword(photoRowBinding.getPhoto().getIndex()) != null) {
-                    final AlertDialog.Builder builder = new AlertDialog.Builder(photoRowBinding.getRoot().getContext());
-                    builder.setTitle("Password");
-                    LayoutEnterPasswordBinding layoutEnterPasswordBinding = LayoutEnterPasswordBinding.inflate(layoutInflater);
-                    EditText password = layoutEnterPasswordBinding.passwordAlbum;
-                    builder.setView(layoutEnterPasswordBinding.getRoot());
-                    builder.setPositiveButton("Confirm", new DialogInterface.OnClickListener() {
-
-                        @Override
-                        public void onClick(DialogInterface dialogInterface, int i) {
-                            BCrypt.Result result = BCrypt.verifyer().verify(password.getText().toString().toCharArray(), AlbumRoute.getPassword(photoRowBinding.getPhoto().getIndex()));
-                            if( result.verified) {
-                                //switch to screen photo
-                                switchToScreenPhoto(photoRowBinding);
-                            }
-                            else
-                                Toast.makeText(photoRowBinding.getRoot().getContext(), "Wrong Password", Toast.LENGTH_SHORT).show();
-                        }
-                    });
-                    builder.show();
-                }
-                else {
-                    switchToScreenPhoto(photoRowBinding);
-                }
-            }
-        });
+//        photoRowBinding.cardView.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                if(AlbumRoute.getPassword(photoRowBinding.getPhoto().getIndex()) != null) {
+//                    final AlertDialog.Builder builder = new AlertDialog.Builder(photoRowBinding.getRoot().getContext());
+//                    builder.setTitle("Password");
+//                    LayoutEnterPasswordBinding layoutEnterPasswordBinding = LayoutEnterPasswordBinding.inflate(layoutInflater);
+//                    EditText password = layoutEnterPasswordBinding.passwordAlbum;
+//                    builder.setView(layoutEnterPasswordBinding.getRoot());
+//                    builder.setPositiveButton("Confirm", new DialogInterface.OnClickListener() {
+//
+//                        @Override
+//                        public void onClick(DialogInterface dialogInterface, int i) {
+//                            BCrypt.Result result = BCrypt.verifyer().verify(password.getText().toString().toCharArray(), AlbumRoute.getPassword(photoRowBinding.getPhoto().getIndex()));
+//                            if( result.verified) {
+//                                //switch to screen photo
+//                                switchToScreenPhoto(photoRowBinding);
+//                            }
+//                            else
+//                                Toast.makeText(photoRowBinding.getRoot().getContext(), "Wrong Password", Toast.LENGTH_SHORT).show();
+//                        }
+//                    });
+//                    builder.show();
+//                }
+//                else {
+//                    switchToScreenPhoto(photoRowBinding);
+//                }
+//            }
+//        });
         return new com.example.model.albums.AlbumViewHolder(photoRowBinding, albumList);
     }
 
@@ -288,7 +289,40 @@ public class AlbumAdapter extends  RecyclerView.Adapter<ViewHolder> {
                 }
             }
         });
+        binding.imgAvtAlbum.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if(AlbumsFragment.isEnable){
+                    if(!isSystemAlbum(AlbumsFragment.binding.rvAlbums,position)){
+                        ClickItem(binding,position);
+                    }
+                }
+                else if(AlbumRoute.getPassword(binding.getPhoto().getIndex()) != null) {
+                    final AlertDialog.Builder builder = new AlertDialog.Builder(binding.getRoot().getContext());
+                    builder.setTitle("Password");
+                    LayoutEnterPasswordBinding layoutEnterPasswordBinding = LayoutEnterPasswordBinding.inflate(LayoutInflater.from(binding.getRoot().getContext()));
+                    EditText password = layoutEnterPasswordBinding.passwordAlbum;
+                    builder.setView(layoutEnterPasswordBinding.getRoot());
+                    builder.setPositiveButton("Confirm", new DialogInterface.OnClickListener() {
 
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {
+                            BCrypt.Result result = BCrypt.verifyer().verify(password.getText().toString().toCharArray(), AlbumRoute.getPassword(binding.getPhoto().getIndex()));
+                            if( result.verified) {
+                                //switch to screen photo
+                                switchToScreenPhoto(binding, position);
+                            }
+                            else
+                                Toast.makeText(binding.getRoot().getContext(), "Wrong Password", Toast.LENGTH_SHORT).show();
+                        }
+                    });
+                    builder.show();
+                }
+                else {
+                    switchToScreenPhoto(binding, position);
+                }
+            }
+        });
     }
 
     public void ClickItem(LayoutAlbumThumbnailBinding layoutAlbumThumbnailBinding, int position) {
@@ -343,9 +377,9 @@ public class AlbumAdapter extends  RecyclerView.Adapter<ViewHolder> {
         return albumList.size();
     }
 
-    private void switchToScreenPhoto(LayoutAlbumThumbnailBinding albumThumbnailBinding){
+    private void switchToScreenPhoto(LayoutAlbumThumbnailBinding albumThumbnailBinding, int pos){
         Intent intent = new Intent(albumThumbnailBinding.getRoot().getContext(), PhotosActivity.class);
-        int pos = albumThumbnailBinding.getPhoto().getIndex()-1;
+        //int pos = albumThumbnailBinding.getPhoto().getIndex()-1;
         PhotoList photoList = AlbumRoute.getPhotoListByAlbum(albumList.get(pos).getId());
 
         intent.putExtra("photoListOfAlbum",photoList);

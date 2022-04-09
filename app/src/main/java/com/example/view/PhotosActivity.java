@@ -108,6 +108,10 @@ public class PhotosActivity extends AppCompatActivity {
                 break;
             case R.id.album_set_password:
                 setPassword();
+                break;
+            case R.id.album_delete:
+                deleteAlbum();
+                break;
         }
 
         if(layout != -1 && layout != currentLayout){
@@ -121,6 +125,36 @@ public class PhotosActivity extends AppCompatActivity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    private void deleteAlbum() {
+        final AlertDialog.Builder deleteDialog = new AlertDialog.Builder(binding.getRoot().getContext());
+        deleteDialog.setTitle("Xóa ảnh");
+        deleteDialog.setMessage("Bạn có chắc chắn muốn xóa album này không?");
+        deleteDialog.setPositiveButton("Có", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                int check = AlbumRoute.deleteAlbum(AlbumRoute.findIdByNameAlbum(nameOfAlbum));
+                if(check > 0) {
+                    Toast.makeText(binding.getRoot().getContext(),
+                            "Xoá thành công",
+                            Toast.LENGTH_SHORT).show();
+                }
+                else {
+                    Toast.makeText(binding.getRoot().getContext(),
+                            "Xoá thất bại",
+                            Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+
+        deleteDialog.setNegativeButton("Không", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+
+            }
+        });
+        deleteDialog.show();
     }
 
     private void setPassword() {
