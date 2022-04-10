@@ -242,4 +242,9 @@ public class AlbumRoute {
         }
         return recAffected;
     }
+    public static void removePhotoInAlbum(int id_photo, int id_album){
+        MainActivity.database.delete("album_photo",
+                "id_album = ? and id_photo = ?",
+                new String[]{String.valueOf(id_album),String.valueOf(id_photo)});
+    }
 }

@@ -1,6 +1,7 @@
 package com.example.model.photos;
 
 import android.annotation.SuppressLint;
+import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
@@ -12,6 +13,9 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
+import android.widget.AdapterView;
+import android.widget.Button;
+import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -22,7 +26,11 @@ import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.model.CustomImageView;
+import com.example.model.albums.AlbumRoute;
+import com.example.model.albums.CustomAlbumDialogAdapter;
+import com.example.model.albums.SingleAlbumCustom;
 import com.example.view.CollageImage;
+import com.example.view.FullscreenPhotoActivity;
 import com.example.view.MainActivity;
 import com.example.view.PhotosFragment;
 import com.example.view.R;
@@ -370,6 +378,10 @@ public class PhotoSortByDateAdapter extends RecyclerView.Adapter<PhotoSortByDate
                                                     actionMode.finish();
                                                     break;
                                                 }
+                                            case R.id.acm_add_to_album:
+                                                addPhotosToAlbum();
+                                                Toast.makeText(context, PhotosFragment.selectedList.size() + "", Toast.LENGTH_SHORT).show();
+                                                    break;
                                         }
                                         return false;
                                     }
@@ -477,7 +489,53 @@ public class PhotoSortByDateAdapter extends RecyclerView.Adapter<PhotoSortByDate
         return 0;
     }
 
+    private void addPhotosToAlbum(){
+        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+        LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        View row = inflater.inflate(R.layout.custom_album_listview,null);
+        ListView lvAlbum = (ListView) row.findViewById(R.id.lvAlbumCustom);
+        Button btnCancel = (Button) row.findViewById(R.id.btnCancelAddAlbum);
+        ObservableArrayList<SingleAlbumCustom> infoAlbum = FullscreenPhotoActivity.getInfoAlbum(context);
+        CustomAlbumDialogAdapter adapter = new CustomAlbumDialogAdapter(context,infoAlbum,R.layout.row_album);
+        lvAlbum.setAdapter(adapter);
+        builder.setView(row);
+        AlertDialog dialog = builder.create();
+        dialog.show();
+        btnCancel.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                dialog.dismiss();
+            }
+        });
+        lvAlbum.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                String name_album = infoAlbum.get(i).getName();
+                int id_album = AlbumRoute.findIdByNameAlbum(name_album);
+                for(int index = 0; index < PhotosFragment.selectedList.size(); index++){
+                    Photo photo = PhotosFragment.selectedList.get(index);
+                    int id_photo = AlbumRoute.findIdByNamePhotos(photo.getFilename());
+                    if(id_photo == -1){
+                        AlbumRoute.addToPhoto(photo);// thêm photo vào bảng photos trước khi đưa vào album_photo
+                        AlbumRoute.addPhotoToAlbum(AlbumRoute.findIdByNamePhotos(photo.getFilename())
+                                ,id_album);
+                    }
+                    else{
+                        boolean isPhotoInAlbum = AlbumRoute.isPhotoInAlbum(id_photo,id_album);
+                        if(isPhotoInAlbum == false){
+                            AlbumRoute.addPhotoToAlbum(AlbumRoute.findIdByNamePhotos(photo.getFilename())
+                                ,id_album);
+                        }
 
+                    }
+                }
+                Toast.makeText(context, "Đã thêm vào " + name_album, Toast.LENGTH_SHORT).show();
+
+
+                dialog.dismiss();
+            }
+        });
+    }
     public class PhotoSortByDateViewHolder extends RecyclerView.ViewHolder{
         private TextView dateAdded;
         private RecyclerView rvPhotoGrid;

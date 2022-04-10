@@ -110,8 +110,8 @@ public class FullscreenPhotoActivity extends AppCompatActivity {
                         }
                         else{
                             // Gỡ ảnh khỏi album
-                            // TO DO
-//                            item.setIcon(R.drawable.ic_baseline_favorite_border_24);
+                            AlbumRoute.removePhotoInAlbum(id_photo,id_album);
+                            item.setIcon(R.drawable.ic_baseline_favorite_border_24);
                         }
                         break;
                     case R.id.mnuEdit2:
@@ -450,7 +450,7 @@ public class FullscreenPhotoActivity extends AppCompatActivity {
             }
         }
     }
-    private ObservableArrayList<SingleAlbumCustom> getInfoAlbum(){
+    public static ObservableArrayList<SingleAlbumCustom> getInfoAlbum(Context context){
         ObservableArrayList<SingleAlbumCustom> result = new ObservableArrayList<>();
         ObservableArrayList<Album> albums = AlbumRoute.getAlbumList();
         int index = 0;
@@ -462,7 +462,7 @@ public class FullscreenPhotoActivity extends AppCompatActivity {
             Photo photo = AlbumRoute.getPhotoById(id_photo);
             Uri uri;
             if(photo != null ){
-                uri = photo.getUri(this);
+                uri = photo.getUri(context);
             }
             else uri = null;
             if(id_album!=2 && id_album != 1 ){
@@ -478,7 +478,7 @@ public class FullscreenPhotoActivity extends AppCompatActivity {
         View row = inflater.inflate(R.layout.custom_album_listview,null);
         ListView lvAlbum = (ListView) row.findViewById(R.id.lvAlbumCustom);
         Button btnCancel = (Button) row.findViewById(R.id.btnCancelAddAlbum);
-        ObservableArrayList<SingleAlbumCustom> infoAlbum = getInfoAlbum();
+        ObservableArrayList<SingleAlbumCustom> infoAlbum = getInfoAlbum(this);
         CustomAlbumDialogAdapter adapter = new CustomAlbumDialogAdapter(this,infoAlbum,R.layout.row_album);
         lvAlbum.setAdapter(adapter);
         builder.setView(row);

@@ -2,6 +2,10 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
+        android:id="@+id/acm_add_to_album"
+        android:title="Add to album"
+        android:icon="@android:drawable/ic_menu_add"/>
+    <item
         android:id="@+id/acm_delete"
         android:title="Delete"
         android:icon="@drawable/ic_baseline_delete_24"/>
