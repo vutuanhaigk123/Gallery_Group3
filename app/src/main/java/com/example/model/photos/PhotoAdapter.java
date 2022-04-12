@@ -15,6 +15,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.databinding.ObservableArrayList;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.model.albums.AlbumList;
 import com.example.view.R;
 import com.example.view.databinding.LayoutFullscreenPhotoBinding;
 import com.example.view.databinding.LayoutPhotoThumbnailBinding;
@@ -22,7 +23,7 @@ import com.example.view.databinding.LayoutPhotoThumbnailBinding;
 import java.util.ArrayList;
 
 public class PhotoAdapter extends RecyclerView.Adapter<ViewHolder> {
-    private PhotoList photoList;
+    public static PhotoList photoList;
     private int mode;
 
     public final static int THUMBNAIL_MODE = 0;

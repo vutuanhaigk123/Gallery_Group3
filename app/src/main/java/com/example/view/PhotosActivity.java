@@ -42,14 +42,14 @@ public class PhotosActivity extends AppCompatActivity {
 
     private ActivityPhotosBinding binding;
     private PhotoList photoList;
-    private PhotoSortByDateAdapter photoSortByAdapter;
+    public static PhotoSortByDateAdapter photoSortByAdapter;
     public static final int LAYOUT_SORT_BY_DATE = 0;
     public static final int LAYOUT_SORT_BY_MONTH = 1;
     public static final int LAYOUT_SORT_BY_YEAR = 2;
     private int currentLayout;
 
-    private boolean isAlbum = false;
-    private String nameOfAlbum;
+    public static boolean isAlbum = false;
+    public static String nameOfAlbum;
     @SuppressLint("RestrictedApi")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -131,7 +131,7 @@ public class PhotosActivity extends AppCompatActivity {
 
     private void deleteAlbum() {
         final AlertDialog.Builder deleteDialog = new AlertDialog.Builder(binding.getRoot().getContext());
-        deleteDialog.setTitle("Xóa ảnh");
+        deleteDialog.setTitle("Xóa album");
         deleteDialog.setMessage("Bạn có chắc chắn muốn xóa album này không?");
         deleteDialog.setPositiveButton("Có", new DialogInterface.OnClickListener() {
             @Override

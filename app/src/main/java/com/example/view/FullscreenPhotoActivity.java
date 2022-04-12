@@ -34,6 +34,8 @@ import android.widget.Toast;
 
 import com.dsphotoeditor.sdk.activity.DsPhotoEditorActivity;
 import com.example.model.albums.Album;
+import com.example.model.albums.AlbumAdapter;
+import com.example.model.albums.AlbumList;
 import com.example.model.albums.AlbumRoute;
 import com.example.model.albums.CustomAlbumDialogAdapter;
 import com.example.model.albums.SingleAlbumCustom;
@@ -41,6 +43,7 @@ import com.example.model.photos.Photo;
 import com.example.model.photos.PhotoAdapter;
 import com.example.model.photos.PhotoList;
 
+import com.example.model.photos.PhotoSortByDateAdapter;
 import com.example.view.databinding.ActivityFullscreenPhotoBinding;
 import com.example.view.databinding.LayoutInfomationImageBinding;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
@@ -65,6 +68,7 @@ public class FullscreenPhotoActivity extends AppCompatActivity {
     public static int EDIT_PHOTO_CODE = 202;
     public static BottomNavigationView bottomNavigationView;
 
+    int posImage;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -78,6 +82,7 @@ public class FullscreenPhotoActivity extends AppCompatActivity {
         bottomNavigationView.setItemIconTintList(null);
         Intent intent = getIntent();
         int pos = intent.getIntExtra("pos", 0);
+        posImage = pos;
         photoList = (PhotoList) intent.getSerializableExtra("photoList");
         photoAdapter = new PhotoAdapter( photoList,
                 PhotoAdapter.FULLSCREEN_MODE);
@@ -147,7 +152,11 @@ public class FullscreenPhotoActivity extends AppCompatActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.option_menu, menu);
+        if(PhotosActivity.isAlbum) {
+            inflater.inflate(R.menu.option_menu_fullscreen_in_album, menu);
+        }
+        else
+            inflater.inflate(R.menu.option_menu, menu);
         return super.onCreateOptionsMenu(menu);
     }
 
@@ -177,8 +186,21 @@ public class FullscreenPhotoActivity extends AppCompatActivity {
             case R.id.mnuAddToAlbum:
                 addToAlbum();
                 break;
+            case R.id.mnuRemoveToAlbum:
+                removeImageForAlbum();
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    private void removeImageForAlbum() {
+        AlbumRoute.removePhotoInAlbum(AlbumRoute.findIdByNamePhotos(photoList.get(posImage).getFilename()), AlbumRoute.findIdByNameAlbum(PhotosActivity.nameOfAlbum));
+        Toast.makeText(this, "Xóa ảnh khỏi album thành công", Toast.LENGTH_SHORT).show();
+        photoList = AlbumRoute.getPhotoListByAlbum(AlbumRoute.findIdByNamePhotos(photoList.get(posImage).getFilename()));
+        PhotosActivity.photoSortByAdapter.setOgPhotoList(photoList);
+        AlbumAdapter.albumList = new AlbumList(AlbumList.readAlbumList());
+        AlbumsFragment.adapter.setAlbumList(AlbumAdapter.albumList);
+
+        finish();
     }
 
     private void editImage2() {
@@ -397,6 +419,7 @@ public class FullscreenPhotoActivity extends AppCompatActivity {
                             Toast.LENGTH_SHORT).show();
                     photoList = new PhotoList(PhotoList.readMediaStore(binding.getRoot().getContext()));
                     finish();
+                    AlbumRoute.deleteImageInData(AlbumRoute.findIdByPhotoPath(current.getPath()));
                 }
                 else {
                     Toast.makeText(FullscreenPhotoActivity.this,

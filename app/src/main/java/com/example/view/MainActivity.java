@@ -72,6 +72,7 @@ public class MainActivity extends AppCompatActivity {
                         if(id != currentButton){
                             switch (id){
                                 case R.id.btnPhotos:
+                                    PhotosActivity.isAlbum = false;
                                     replaceFragment(photosFragment, R.id.btnPhotos);
                                     break;
                                 case R.id.btnAlbums:

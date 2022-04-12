@@ -327,12 +327,9 @@ public class PhotoSortByDateAdapter extends RecyclerView.Adapter<PhotoSortByDate
                                         // Khi click action mode item
                                         switch (menuItem.getItemId()){
                                             case R.id.acm_delete:
-//                                                for(Photo photo: PhotosFragment.selectedList){
-//                                                    photoList.getPhotoList().remove(photo);
-//                                                }
-//                                                if(photoList.getPhotoList().size() == 0){
-//                                                    // TO DO
-//                                                }
+                                                for(Photo photo: PhotosFragment.selectedList){
+                                                    //int check = AlbumRoute.deleteImage(AlbumRoute.findIdByNamePhotos(photo.getFilename()));
+                                                }
                                                 actionMode.finish();
                                                 break;
                                             case R.id.acm_select_all:

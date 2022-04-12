@@ -247,4 +247,21 @@ public class AlbumRoute {
                 "id_album = ? and id_photo = ?",
                 new String[]{String.valueOf(id_album),String.valueOf(id_photo)});
     }
+
+//    public static int removeImageForAlbum(int id_album, int id_img) {
+//        int recAffected = MainActivity.database.delete("album_photo",
+//                "id_album = ? and id_photo = ?",
+//                new String[]{String.valueOf(id_album), String.valueOf(id_img)});
+//        return recAffected;
+//    }
+
+    public static void deleteImageInData(int id_img) {
+        MainActivity.database.delete("photos",
+                "id = ?",
+                new String[]{String.valueOf(id_img)});
+
+        MainActivity.database.delete("album_photo",
+                "id_photo = ?",
+                new String[]{String.valueOf(id_img)});
+    }
 }
