@@ -23,7 +23,7 @@ import com.example.view.databinding.LayoutPhotoThumbnailBinding;
 import java.util.ArrayList;
 
 public class PhotoAdapter extends RecyclerView.Adapter<ViewHolder> {
-    public static PhotoList photoList;
+    private PhotoList photoList;
     private int mode;
 
     public final static int THUMBNAIL_MODE = 0;
