@@ -38,7 +38,7 @@ public class PhotosFragment extends Fragment {
     private static final String ARG_PARAM2 = "param2";
     private FragmentPhotosBinding binding;
     public static PhotoList photoList;
-    private PhotoSortByDateAdapter photoSortByAdapter;
+    public static PhotoSortByDateAdapter photoSortByAdapter;
     public static final int LAYOUT_SORT_BY_DATE = 0;
     public static final int LAYOUT_SORT_BY_MONTH = 1;
     public static final int LAYOUT_SORT_BY_YEAR = 2;

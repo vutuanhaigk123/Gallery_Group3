@@ -171,10 +171,23 @@ public class AlbumRoute {
         cursor.close();
         return  new PhotoList(listIdPhoto);
     }
+
+    public static ObservableArrayList<Long> getDateAddedOfPhotosInAlbum(int id_album){
+        ObservableArrayList<Long> dateAddedOfPhotosInAlbum = new ObservableArrayList<>();
+        Cursor cursor = MainActivity.database.rawQuery("select dateAdded from album_photo where id_album = " + id_album, null);
+        while (cursor.moveToNext()){
+            long dateAdded = cursor.getLong(0);
+            dateAddedOfPhotosInAlbum.add(dateAdded);
+        }
+        cursor.close();
+        return dateAddedOfPhotosInAlbum;
+    }
     public static void addPhotoToAlbum(int id_photo, int id_album){
+        long dateAdded = System.currentTimeMillis();
         ContentValues cv = new ContentValues();
         cv.put("id_album", id_album);
         cv.put("id_photo",id_photo);
+        cv.put("dateAdded",dateAdded);
         MainActivity.database.insert("album_photo",null,cv);
     }
     public static void addToPhoto(Photo photo){

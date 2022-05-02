@@ -3,6 +3,7 @@ package com.example.model.photos;
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
 import android.view.ActionMode;
@@ -327,10 +328,25 @@ public class PhotoSortByDateAdapter extends RecyclerView.Adapter<PhotoSortByDate
                                         // Khi click action mode item
                                         switch (menuItem.getItemId()){
                                             case R.id.acm_delete:
-                                                for(Photo photo: PhotosFragment.selectedList){
-                                                    //int check = AlbumRoute.deleteImage(AlbumRoute.findIdByNamePhotos(photo.getFilename()));
-                                                }
-                                                actionMode.finish();
+                                                final AlertDialog.Builder deleteDialog = new AlertDialog.Builder(context);
+                                                deleteDialog.setTitle("Xóa ảnh");
+                                                deleteDialog.setMessage("Bạn có chắc chắn muốn xóa ảnh này không?");
+                                                deleteDialog.setPositiveButton("Có", new DialogInterface.OnClickListener() {
+                                                    @Override
+                                                    public void onClick(DialogInterface dialogInterface, int i) {
+                                                        for(Photo photo: PhotosFragment.selectedList){
+                                                            delImage(photo);
+                                                        }
+                                                        actionMode.finish();
+                                                    }
+                                                });
+                                                deleteDialog.setNegativeButton("Không", new DialogInterface.OnClickListener() {
+                                                    @Override
+                                                    public void onClick(DialogInterface dialogInterface, int i) {
+
+                                                    }
+                                                });
+                                                deleteDialog.show();
                                                 break;
                                             case R.id.acm_select_all:
                                                 if(PhotosFragment.selectedList.size() == ogPhotoList.getPhotoList().size()){
@@ -550,5 +566,15 @@ public class PhotoSortByDateAdapter extends RecyclerView.Adapter<PhotoSortByDate
             return binding;
         }
 
+    }
+    private void delImage(Photo photo){
+        AlbumRoute.addToPhoto(photo);// thêm photo vào bảng photos trước khi đưa vào album_photo
+        AlbumRoute.addPhotoToAlbum(AlbumRoute.findIdByNamePhotos(photo.getFilename())
+                ,AlbumRoute.ID_ALBUM_DELETED);
+        Toast.makeText(context,
+                "Đã chuyển vào thùng rác",
+                Toast.LENGTH_SHORT).show();
+        FullscreenPhotoActivity.photoList = new PhotoList(PhotoList.readMediaStore(context));
+        PhotosFragment.photoSortByAdapter.setOgPhotoList(FullscreenPhotoActivity.photoList);
     }
 }

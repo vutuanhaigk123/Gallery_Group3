@@ -13,6 +13,7 @@ import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.os.Handler;
 import android.text.InputType;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -26,10 +27,14 @@ import android.widget.Toast;
 import com.example.model.albums.Album;
 import com.example.model.albums.AlbumAdapter;
 import com.example.model.albums.AlbumList;
+import com.example.model.albums.AlbumRoute;
 import com.example.model.photos.PhotoList;
 import com.example.view.databinding.FragmentAlbumsBinding;
 
+import java.io.File;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Date;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -44,11 +49,42 @@ public class AlbumsFragment extends Fragment {
     private static final String ARG_PARAM2 = "param2";
     public static FragmentAlbumsBinding binding;
     private PhotoList screenshotsAlbum;
+    private PhotoList deletedAlbum;
     private AlbumList albumList;
     public static AlbumAdapter adapter;
     public static boolean isEnable = false;
     public static boolean isSelectAll = false;
     public static ObservableArrayList<Album> selectedList = new ObservableArrayList<>();
+    private Handler handler = new Handler();
+    private Runnable runnable = new Runnable() {
+        @Override
+        public void run() {
+            try{
+                deletedAlbum = AlbumRoute.getPhotoListByAlbum(2);
+                ObservableArrayList<Long> dateAddedInAlbumList = AlbumRoute.getDateAddedOfPhotosInAlbum(2);
+                Collections.reverse(dateAddedInAlbumList);
+                long now = System.currentTimeMillis();
+                for(int i =0; i < deletedAlbum.size();i++){
+                    Date date = new Date(dateAddedInAlbumList.get(i));
+                    long diff = now - dateAddedInAlbumList.get(i);
+                    long dateDiff = diff / (24 * 60 *60 * 1000);
+                    if(dateDiff >= 30){ // If the date difference more than 30 days, delete the photo
+                        File file = new File(deletedAlbum.get(i).getPath());
+                        FullscreenPhotoActivity.deleteFileFromMediaStore(getActivity().getContentResolver(), file);
+                        AlbumRoute.deleteImageInData(AlbumRoute.findIdByPhotoPath(deletedAlbum.get(i).getPath()));
+                        albumList = new AlbumList(AlbumList.readAlbumList());
+                        adapter.notifyDataSetChanged();
+                        System.out.println("Đã xoá");
+                    }
+                }
+            }
+            catch(Exception e){
+                // added try catch block to be sure of uninterupted execution
+            }
+            // Check out of date deleted images each hour
+            handler.postDelayed(this, 60 * 60 * 1000);
+        }
+    };
     // TODO: Rename and change types of parameters
     private String mParam1;
     private String mParam2;
@@ -85,6 +121,10 @@ public class AlbumsFragment extends Fragment {
         screenshotsAlbum = new PhotoList(PhotoList.readSceenshotPhotos(getContext()));
         albumList = new AlbumList(AlbumList.readAlbumList());
         setHasOptionsMenu(true);
+
+
+        // Run thread
+        handler.post(runnable);
     }
 
     @Override

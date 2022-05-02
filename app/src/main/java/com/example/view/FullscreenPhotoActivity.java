@@ -63,7 +63,7 @@ public class FullscreenPhotoActivity extends AppCompatActivity {
     private ActivityFullscreenPhotoBinding binding;
     private PhotoAdapter photoAdapter;
     public static ActionBar actionBar;
-    private PhotoList photoList;
+    public static PhotoList photoList;
     private int newImageIndex;
     public static int EDIT_PHOTO_CODE = 202;
     public static BottomNavigationView bottomNavigationView;
@@ -410,22 +410,32 @@ public class FullscreenPhotoActivity extends AppCompatActivity {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
                 Photo current = getCurrentPhoto();
-                String path = current.getPath();
-                File file = new File(path);
-                int deletedPhotos = deleteFileFromMediaStore(getContentResolver(), file);
-                if( deletedPhotos > 0){
-                    Toast.makeText(FullscreenPhotoActivity.this,
-                            "Xoá thành công " + deletedPhotos + " ảnh",
-                            Toast.LENGTH_SHORT).show();
-                    photoList = new PhotoList(PhotoList.readMediaStore(binding.getRoot().getContext()));
-                    finish();
-                    AlbumRoute.deleteImageInData(AlbumRoute.findIdByPhotoPath(current.getPath()));
-                }
-                else {
-                    Toast.makeText(FullscreenPhotoActivity.this,
-                            "Xoá ảnh thất bại. Xảy ra lỗi khi xoá ảnh",
-                            Toast.LENGTH_SHORT).show();
-                }
+                AlbumRoute.addToPhoto(current);// thêm photo vào bảng photos trước khi đưa vào album_photo
+                AlbumRoute.addPhotoToAlbum(AlbumRoute.findIdByNamePhotos(current.getFilename())
+                        ,AlbumRoute.ID_ALBUM_DELETED);
+                Toast.makeText(FullscreenPhotoActivity.this,
+                        "Đã chuyển vào thùng rác",
+                        Toast.LENGTH_SHORT).show();
+                photoList = new PhotoList(PhotoList.readMediaStore(binding.getRoot().getContext()));
+                finish();
+
+
+//                String path = current.getPath();
+//                File file = new File(path);
+//                int deletedPhotos = deleteFileFromMediaStore(getContentResolver(), file);
+//                if( deletedPhotos > 0){
+//                    Toast.makeText(FullscreenPhotoActivity.this,
+//                            "Xoá thành công " + deletedPhotos + " ảnh",
+//                            Toast.LENGTH_SHORT).show();
+//                    photoList = new PhotoList(PhotoList.readMediaStore(binding.getRoot().getContext()));
+//                    finish();
+//                    AlbumRoute.deleteImageInData(AlbumRoute.findIdByPhotoPath(current.getPath()));
+//                }
+//                else {
+//                    Toast.makeText(FullscreenPhotoActivity.this,
+//                            "Xoá ảnh thất bại. Xảy ra lỗi khi xoá ảnh",
+//                            Toast.LENGTH_SHORT).show();
+//                }
 //                Toast.makeText(FullscreenPhotoActivity.this,
 //                        deleteFileFromMediaStore(getContentResolver(), file) + "",
 //                        Toast.LENGTH_SHORT).show();
