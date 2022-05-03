@@ -178,6 +178,7 @@ public class AlbumsFragment extends Fragment {
         final EditText input = new EditText(getContext());
         input.setHint("Tên album");
         input.setInputType(InputType.TYPE_CLASS_TEXT);
+        input.setInputType(InputType.TYPE_CLASS_TEXT);
         builder.setView(input);
 
         builder.setPositiveButton("Tạo", new DialogInterface.OnClickListener() {

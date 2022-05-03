@@ -136,8 +136,13 @@ public class PhotosActivity extends AppCompatActivity {
         deleteDialog.setPositiveButton("Có", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
-                int check = AlbumRoute.deleteAlbum(AlbumRoute.findIdByNameAlbum(nameOfAlbum));
-                if(check > 0) {
+                int id = AlbumRoute.findIdByNameAlbum(nameOfAlbum);
+                if (id <= 3){
+                    Toast.makeText(PhotosActivity.this, "Không thể xóa album mặc định", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+                int check = AlbumRoute.deleteAlbum(id);
+                if(check > 0 ){
                     Toast.makeText(binding.getRoot().getContext(),
                             "Xoá thành công",
                             Toast.LENGTH_SHORT).show();
