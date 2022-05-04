@@ -410,9 +410,11 @@ public class FullscreenPhotoActivity extends AppCompatActivity {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
                 Photo current = getCurrentPhoto();
+                AlbumRoute.deleteImageInAllAlbum(AlbumRoute.findIdByNamePhotos(current.getFilename()));
                 AlbumRoute.addToPhoto(current);// thêm photo vào bảng photos trước khi đưa vào album_photo
                 AlbumRoute.addPhotoToAlbum(AlbumRoute.findIdByNamePhotos(current.getFilename())
                         ,AlbumRoute.ID_ALBUM_DELETED);
+
                 Toast.makeText(FullscreenPhotoActivity.this,
                         "Đã chuyển vào thùng rác",
                         Toast.LENGTH_SHORT).show();

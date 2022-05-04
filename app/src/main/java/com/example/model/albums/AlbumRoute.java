@@ -277,4 +277,12 @@ public class AlbumRoute {
                 "id_photo = ?",
                 new String[]{String.valueOf(id_img)});
     }
+
+    public static void deleteImageInAllAlbum(int id_img) {
+        int recAffected = MainActivity.database.delete("album_photo",
+                "id_photo = ?",
+                new String[]{String.valueOf(id_img)});
+
+        System.out.println(recAffected);
+    }
 }

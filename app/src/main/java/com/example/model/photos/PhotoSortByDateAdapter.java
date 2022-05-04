@@ -27,16 +27,21 @@ import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.model.CustomImageView;
+import com.example.model.albums.AlbumAdapter;
+import com.example.model.albums.AlbumList;
 import com.example.model.albums.AlbumRoute;
 import com.example.model.albums.CustomAlbumDialogAdapter;
 import com.example.model.albums.SingleAlbumCustom;
+import com.example.view.AlbumsFragment;
 import com.example.view.CollageImage;
 import com.example.view.FullscreenPhotoActivity;
 import com.example.view.MainActivity;
 import com.example.view.PhotosFragment;
+import com.example.view.PhotosActivity;
 import com.example.view.R;
 import com.example.view.databinding.LayoutPhotoByDateAddedBinding;
 
+import java.io.File;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -305,7 +310,12 @@ public class PhotoSortByDateAdapter extends RecyclerView.Adapter<PhotoSortByDate
                                     @Override
                                     public boolean onCreateActionMode(ActionMode actionMode, Menu menu) {
                                         MenuInflater menuInflater = actionMode.getMenuInflater();
-                                        menuInflater.inflate(R.menu.action_mode_menu,menu);
+                                        if(PhotosActivity.isAlbum == true && AlbumRoute.findIdByNameAlbum(PhotosActivity.nameOfAlbum) == AlbumRoute.ID_ALBUM_DELETED)
+                                            menuInflater.inflate(R.menu.action_mode_menu_image_album_delete,menu);
+                                        else if (PhotosActivity.isAlbum == true && AlbumRoute.findIdByNameAlbum(PhotosActivity.nameOfAlbum) != AlbumRoute.ID_ALBUM_DELETED)
+                                            menuInflater.inflate(R.menu.action_mode_menu_image_album,menu);
+                                        else
+                                            menuInflater.inflate(R.menu.action_mode_menu,menu);
                                         actionMode.setTitle("Choose your option");
                                         return true;
                                     }
@@ -327,6 +337,69 @@ public class PhotoSortByDateAdapter extends RecyclerView.Adapter<PhotoSortByDate
                                     public boolean onActionItemClicked(ActionMode actionMode, MenuItem menuItem) {
                                         // Khi click action mode item
                                         switch (menuItem.getItemId()){
+                                            case R.id.acm_delete_permanently:
+                                                final AlertDialog.Builder deletePermanentlyDialog = new AlertDialog.Builder(context);
+                                                deletePermanentlyDialog.setTitle("Xóa ảnh vĩnh viễn");
+                                                deletePermanentlyDialog.setMessage("Bạn có chắc chắn muốn xóa ảnh này vĩnh viễn không?");
+                                                deletePermanentlyDialog.setPositiveButton("Có", new DialogInterface.OnClickListener() {
+                                                    @Override
+                                                    public void onClick(DialogInterface dialogInterface, int i) {
+                                                        for(Photo photo: PhotosFragment.selectedList){
+                                                            delPermanentlyImage(photo);
+                                                        }
+                                                        actionMode.finish();
+                                                    }
+                                                });
+                                                deletePermanentlyDialog.setNegativeButton("Không", new DialogInterface.OnClickListener() {
+                                                    @Override
+                                                    public void onClick(DialogInterface dialogInterface, int i) {
+
+                                                    }
+                                                });
+                                                deletePermanentlyDialog.show();
+                                                break;
+                                            case R.id.acm_remove_image:
+                                                final AlertDialog.Builder removeDialog = new AlertDialog.Builder(context);
+                                                removeDialog.setTitle("Xóa ảnh khỏi album");
+                                                removeDialog.setMessage("Bạn có chắc chắn muốn xóa ảnh khỏi album này không?");
+                                                removeDialog.setPositiveButton("Có", new DialogInterface.OnClickListener() {
+                                                    @Override
+                                                    public void onClick(DialogInterface dialogInterface, int i) {
+                                                        for(Photo photo: PhotosFragment.selectedList){
+                                                            delImageAlbum(photo);
+                                                        }
+                                                        actionMode.finish();
+                                                    }
+                                                });
+                                                removeDialog.setNegativeButton("Không", new DialogInterface.OnClickListener() {
+                                                    @Override
+                                                    public void onClick(DialogInterface dialogInterface, int i) {
+
+                                                    }
+                                                });
+                                                removeDialog.show();
+                                                break;
+                                            case R.id.acm_recover_image:
+                                                final AlertDialog.Builder recoverDialog = new AlertDialog.Builder(context);
+                                                recoverDialog.setTitle("Khôi phục ảnh");
+                                                recoverDialog.setMessage("Bạn có chắc chắn muốn khôi phục ảnh này không?");
+                                                recoverDialog.setPositiveButton("Có", new DialogInterface.OnClickListener() {
+                                                    @Override
+                                                    public void onClick(DialogInterface dialogInterface, int i) {
+                                                        for(Photo photo: PhotosFragment.selectedList){
+                                                            recoverImage(photo);
+                                                        }
+                                                        actionMode.finish();
+                                                    }
+                                                });
+                                                recoverDialog.setNegativeButton("Không", new DialogInterface.OnClickListener() {
+                                                    @Override
+                                                    public void onClick(DialogInterface dialogInterface, int i) {
+
+                                                    }
+                                                });
+                                                recoverDialog.show();
+                                                break;
                                             case R.id.acm_delete:
                                                 final AlertDialog.Builder deleteDialog = new AlertDialog.Builder(context);
                                                 deleteDialog.setTitle("Xóa ảnh");
@@ -568,6 +641,7 @@ public class PhotoSortByDateAdapter extends RecyclerView.Adapter<PhotoSortByDate
 
     }
     private void delImage(Photo photo){
+        AlbumRoute.deleteImageInAllAlbum(AlbumRoute.findIdByNamePhotos(photo.getFilename()));
         AlbumRoute.addToPhoto(photo);// thêm photo vào bảng photos trước khi đưa vào album_photo
         AlbumRoute.addPhotoToAlbum(AlbumRoute.findIdByNamePhotos(photo.getFilename())
                 ,AlbumRoute.ID_ALBUM_DELETED);
@@ -576,5 +650,42 @@ public class PhotoSortByDateAdapter extends RecyclerView.Adapter<PhotoSortByDate
                 Toast.LENGTH_SHORT).show();
         FullscreenPhotoActivity.photoList = new PhotoList(PhotoList.readMediaStore(context));
         PhotosFragment.photoSortByAdapter.setOgPhotoList(FullscreenPhotoActivity.photoList);
+    }
+
+    private void recoverImage(Photo photo){
+        AlbumRoute.deleteImageInData(AlbumRoute.findIdByNamePhotos(photo.getFilename()));
+        Toast.makeText(context,
+                "Đã khôi phục thành công",
+                Toast.LENGTH_SHORT).show();
+        FullscreenPhotoActivity.photoList = new PhotoList(PhotoList.readMediaStore(context));
+        PhotosFragment.photoSortByAdapter.setOgPhotoList(FullscreenPhotoActivity.photoList);
+        ogPhotoList = AlbumRoute.getPhotoListByAlbum(AlbumRoute.ID_ALBUM_DELETED);
+        PhotosActivity.photoSortByAdapter.setOgPhotoList(ogPhotoList);
+        AlbumAdapter.albumList = new AlbumList(AlbumList.readAlbumList());
+        AlbumsFragment.adapter.setAlbumList(AlbumAdapter.albumList);
+    }
+
+    private void delImageAlbum(Photo photo) {
+        AlbumRoute.removePhotoInAlbum(AlbumRoute.findIdByNamePhotos(photo.getFilename()), AlbumRoute.findIdByNameAlbum(PhotosActivity.nameOfAlbum));
+
+        ogPhotoList = AlbumRoute.getPhotoListByAlbum(AlbumRoute.findIdByNameAlbum(PhotosActivity.nameOfAlbum));
+        PhotosActivity.photoSortByAdapter.setOgPhotoList(ogPhotoList);
+        AlbumAdapter.albumList = new AlbumList(AlbumList.readAlbumList());
+        AlbumsFragment.adapter.setAlbumList(AlbumAdapter.albumList);
+    }
+
+    private void delPermanentlyImage(Photo photo) {
+        AlbumRoute.deleteImageInData(AlbumRoute.findIdByNamePhotos(photo.getFilename()));
+
+        String path = photo.getPath();
+        File file = new File(path);
+        int deletedPhotos = FullscreenPhotoActivity.deleteFileFromMediaStore(this.context.getContentResolver(), file);
+
+        FullscreenPhotoActivity.photoList = new PhotoList(PhotoList.readMediaStore(context));
+        PhotosFragment.photoSortByAdapter.setOgPhotoList(FullscreenPhotoActivity.photoList);
+        ogPhotoList = AlbumRoute.getPhotoListByAlbum(AlbumRoute.ID_ALBUM_DELETED);
+        PhotosActivity.photoSortByAdapter.setOgPhotoList(ogPhotoList);
+        AlbumAdapter.albumList = new AlbumList(AlbumList.readAlbumList());
+        AlbumsFragment.adapter.setAlbumList(AlbumAdapter.albumList);
     }
 }
