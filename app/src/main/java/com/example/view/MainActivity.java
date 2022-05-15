@@ -1,5 +1,6 @@
 package com.example.view;
 
+import static android.os.Build.VERSION.SDK_INT;
 import static androidx.appcompat.app.AppCompatDelegate.MODE_NIGHT_YES;
 
 import androidx.annotation.NonNull;
@@ -13,9 +14,13 @@ import androidx.fragment.app.FragmentTransaction;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.sqlite.SQLiteDatabase;
+import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
+import android.provider.Settings;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
@@ -26,6 +31,7 @@ import android.widget.Toast;
 import com.example.view.databinding.ActivityMainBinding;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigation.NavigationBarView;
+import com.google.android.material.snackbar.Snackbar;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -39,7 +45,8 @@ public class MainActivity extends AppCompatActivity {
     private ActivityMainBinding binding;
     private AlbumsFragment albumsFragment;
     private PhotosFragment photosFragment;
-    private SearchFragment searchFragment;
+    private UserFragment userFragment;
+    public static String userEmail;
     private int currentButton;
     private final String DB_NAME = "DBGallery.db";
     private final String DB_PATH = "/databases/";// lưu trữ trong thư mục cài đặt gốc
@@ -49,6 +56,8 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Intent intent = getIntent();
+        userEmail = intent.getStringExtra("userEmail");
         //lần đầu thì copy
         copyDatabaseFromAssets();
         database = openOrCreateDatabase(DB_NAME, MODE_PRIVATE, null);
@@ -58,10 +67,34 @@ public class MainActivity extends AppCompatActivity {
         AppCompatDelegate.setDefaultNightMode(MODE_NIGHT_YES);
         addControls();
         addEvents();
+        requestPermissionToManageAllFolder();
         requestReadPermission();
         replaceFragment(photosFragment, R.id.btnPhotos);
     }
 
+    private void requestPermissionToManageAllFolder(){
+        if(SDK_INT >= 30) {
+            if (!Environment.isExternalStorageManager()) {
+                Snackbar.make(findViewById(android.R.id.content), "Permission needed!", Snackbar.LENGTH_INDEFINITE)
+                        .setAction("Settings", new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+
+                                try {
+                                    Uri uri = Uri.parse("package:" + BuildConfig.APPLICATION_ID);
+                                    Intent intent = new Intent(Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION, uri);
+                                    startActivity(intent);
+                                } catch (Exception ex) {
+                                    Intent intent = new Intent();
+                                    intent.setAction(Settings.ACTION_MANAGE_ALL_FILES_ACCESS_PERMISSION);
+                                    startActivity(intent);
+                                }
+                            }
+                        })
+                        .show();
+            }
+        }
+    }
     private void addEvents() {
         binding.bottomNavigationView2.setOnItemSelectedListener(
                 new NavigationBarView.OnItemSelectedListener() {
@@ -78,8 +111,8 @@ public class MainActivity extends AppCompatActivity {
                                 case R.id.btnAlbums:
                                     replaceFragment(albumsFragment, R.id.btnAlbums);
                                     break;
-                                case R.id.btnSearch:
-                                    replaceFragment(searchFragment, R.id.btnSearch);
+                                case R.id.btnUser:
+                                    replaceFragment(userFragment, R.id.btnUser);
                                     break;
                             }
                         }
@@ -135,7 +168,7 @@ public class MainActivity extends AppCompatActivity {
         pgBar = findViewById(R.id.pgBar);
         albumsFragment = new AlbumsFragment();
         photosFragment = new PhotosFragment();
-        searchFragment = new SearchFragment();
+        userFragment = UserFragment.newInstance(userEmail);
     }
 
     private void getAlbum(){

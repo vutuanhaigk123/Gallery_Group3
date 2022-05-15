@@ -6,6 +6,7 @@ import android.app.DatePickerDialog;
 import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.InputType;
@@ -28,12 +29,19 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.model.albums.AlbumAdapter;
 import com.example.model.albums.AlbumList;
 import com.example.model.albums.AlbumRoute;
+import com.example.model.photos.Photo;
 import com.example.model.photos.PhotoAdapter;
 import com.example.model.photos.PhotoList;
 import com.example.model.photos.PhotoSortByDateAdapter;
 import com.example.view.databinding.ActivityPhotosBinding;
 import com.example.view.databinding.LayoutSetPasswordBinding;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
 
+import java.io.File;
 import java.util.Collections;
 
 import at.favre.lib.crypto.bcrypt.BCrypt;

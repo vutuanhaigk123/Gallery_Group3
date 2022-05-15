@@ -80,6 +80,11 @@ public class PhotoSortByDateAdapter extends RecyclerView.Adapter<PhotoSortByDate
         ObservableArrayList<Photo> photoList = ogPhotoList.getPhotoList();
         PhotoSortByDateAdapter.ogPhotoList = new PhotoList((ObservableArrayList<Photo>) photoList.clone());
         initPhotoAdapter(ogPhotoList.getPhotoList());
+        System.out.println("---------OgList----------");
+        for (Photo photo : this.getOgPhotoList().getPhotoList()){
+            System.out.println(photo.getIndex());
+        }
+        System.out.println("-----------------------");
         notifyDataSetChanged();
     }
 
@@ -125,6 +130,26 @@ public class PhotoSortByDateAdapter extends RecyclerView.Adapter<PhotoSortByDate
                 }
 
             }
+        }
+    }
+
+    public void sortOgPhotoListByMilliseconds(ObservableArrayList<Photo> photoList){
+        Collections.sort(photoList, new Comparator<Photo>() {
+            @Override
+            public int compare(Photo p1, Photo p2) {
+                return p1.getMilliseconds().compareTo(p2.getMilliseconds());
+            }
+        });
+    }
+    public void allocateIndexOfOgListByMilliseconds(){
+        Collections.sort(this.getOgPhotoList().getPhotoList(), new Comparator<Photo>() {
+            @Override
+            public int compare(Photo p1, Photo p2) {
+                return p2.getMilliseconds().compareTo(p1.getMilliseconds());
+            }
+        });
+        for(int i = 0; i < this.getOgPhotoList().getPhotoList().size();i++){
+            this.getOgPhotoList().getPhotoList().get(i).setIndex(this.getOgPhotoList().getPhotoList().size() - i -1);
         }
     }
 
@@ -241,17 +266,35 @@ public class PhotoSortByDateAdapter extends RecyclerView.Adapter<PhotoSortByDate
         ObservableArrayList<PhotoSortByDate> photoSortByDateList =
                 new ObservableArrayList<PhotoSortByDate>();
         String dateAdded = "";
+        ArrayList<String> addedDateInList = new ArrayList<>();
+        sortOgPhotoListByMilliseconds(photoList);
         parseMillisecondToDate(photoList, this.layout);
         for(int i = 0; i < photoList.size(); i++){
-            if(!dateAdded.equals(photoList.get(i).getDateAdded())){
+//            if(!dateAdded.equals(photoList.get(i).getDateAdded()))
+            if(!addedDateInList.contains(photoList.get(i).getDateAdded()))
+            {
                 dateAdded = photoList.get(i).getDateAdded();
+                addedDateInList.add(dateAdded);
+                int count = 0;
+                int j = -1;
                 // Danh sách tạm chứa các ảnh có cùng ngày
                 ObservableArrayList<Photo> tempList = new ObservableArrayList<Photo>();
-                while(i < photoList.size() && dateAdded.equals(photoList.get(i).getDateAdded())){
-                    tempList.add(photoList.get(i));
+                while(i < photoList.size()){
+                    if(dateAdded.equals(photoList.get(i).getDateAdded())){
+                        tempList.add(photoList.get(i));
+                    }
+                    else{
+                        count++;
+                        if(count == 1){
+                            j = i;
+                        }
+                    }
                     i++;
                 }
-                i--;
+                if(j != -1){
+                    i = j;
+                    i--;
+                }
                 PhotoList photoListTemp = new PhotoList(tempList);
                 // Danh sách tạm chứa các danh sách đã sắp xếp theo ngày
                 PhotoSortByDate temp = new PhotoSortByDate(dateAdded,photoListTemp);
@@ -269,6 +312,11 @@ public class PhotoSortByDateAdapter extends RecyclerView.Adapter<PhotoSortByDate
 //                System.out.println(this.photoSortByDateList.get(i).getPhotoSortByDateList().get(j).getFilename());
 //            }
 //        }
+
+//        for (PhotoSortByDate photoSortByDate : photoSortByDateList){
+//            System.out.println(photoSortByDate.getDateAdded());
+//        }
+//        System.out.println("----------------");
         notifyDataSetChanged();
     }
     @NonNull

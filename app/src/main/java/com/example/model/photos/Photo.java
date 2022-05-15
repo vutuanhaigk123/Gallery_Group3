@@ -31,6 +31,18 @@ public class Photo implements Serializable {
     private int index;
     private boolean isClicked = false;
 
+
+    public Photo(){
+        // Default constructor required for calls to DataSnapshot.getValue(Post.class)
+    }
+
+    public Photo(String path,String dateAdded, String filename) {
+        this.path = path;
+        this.dateAdded = dateAdded;
+        this.milliseconds = dateAdded;
+        this.filename = filename;
+    }
+
     public Photo(String path, String dateAdded,
                  String mimeType, String filename,
                  int index) {
@@ -105,19 +117,14 @@ public class Photo implements Serializable {
     }
 
     @BindingAdapter("android:loadImage")
-    public static void loadImage(SubsamplingScaleImageView view, String imageUrl){
+    public static void loadImage(ImageView imageView, String imageUrl){
 //        Glide.with(imageView.getContext())
 //                .load(imageUrl)
 //                .into(imageView);
-        Glide.with(view.getContext())
+        Glide.with(imageView.getContext())
                 .load(imageUrl)
                 .apply(RequestOptions.diskCacheStrategyOf(DiskCacheStrategy.AUTOMATIC))
-                .into(new SimpleTarget<Drawable>() {
-                    @Override
-                    public void onResourceReady(@NonNull Drawable resource, @Nullable Transition<? super Drawable> transition) {
-                        view.setImage(ImageSource.uri(imageUrl));
-                    }
-                });
+                .into(imageView);
     }
 
     @BindingAdapter("android:loadThumb")
@@ -128,6 +135,7 @@ public class Photo implements Serializable {
                 .apply(RequestOptions.centerCropTransform())
                 .apply(RequestOptions.diskCacheStrategyOf(DiskCacheStrategy.AUTOMATIC))
                 .into(imageView);
+        System.out.println("Glide chay");
     }
 
 }
